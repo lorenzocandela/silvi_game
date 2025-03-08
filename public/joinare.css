@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'retropix';
+    src: url(./assets/font/retropix.ttf);
+}
+
+* {
+    font-family: 'retropix' !important;
+}
+
 .menu-container {
     position: fixed;
     top: 0;
