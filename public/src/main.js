@@ -55,9 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 sepia(0.2)
                 hue-rotate(40deg) 
                 saturate(1.5);
-            box-shadow: 
-                inset 0 0 10px rgba(0, 255, 0, 0.3),
-                0 0 7px rgba(0, 255, 0, 0.7);
         }
 
         #crtOverlay {
@@ -382,9 +379,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const floorImagesLoaded = {};
 
-    const spriteWidth = 64; 
-    const spriteHeight = 96; 
-    const columns = 4; 
+    const spriteWidth = 29; // 116 / 4 = 29 px 
+    const spriteHeight = 30.5; // 122 / 4 = 30.5 pixels 
+    const columns = 4;
 
     window.spriteWidth = spriteWidth;
     window.spriteHeight = spriteHeight;
@@ -392,13 +389,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let player = {
         x: 140,
         y: 140,
-        width: spriteWidth * 0.5,
-        height: spriteHeight * 0.5,
-        speed: 4
+        width: spriteWidth * 1.5, // 1.5 con nuove misure (prima era *.8)
+        height: spriteHeight * 1.5, // 1.5 con nuove misure (prima era *.8)
+        speed: 3,
     };
 
     window.player = player;
 
+    //TODO: Controlla i vicoli cechi, ci sono stanze sbagliate
     const roomSystem = {
         connections: {
             1: [2, 5, 6], 
@@ -657,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function drawSprite() {
         if (!playerSprite.complete) return;
-
+    
         ctx.drawImage(
             playerSprite,
             frameIndex * spriteWidth, currentDirection * spriteHeight, 
@@ -665,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
             player.x, player.y, 
             player.width, player.height 
         );
-
+    
         if (window.isMultiplayer) {
             ctx.fillStyle = "green";
             ctx.font = "12px Arial";
