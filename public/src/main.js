@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
             13: [7, 18],
             14: [8, 19],
             15: [9, 20],
-            16: [11],
+            16: [11, 1, 4],
             17: [11, 21],
             18: [13, 22],
             19: [14, 22],
@@ -454,30 +454,30 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         currentRoom: 1,
         roomNames: {
-            1: "Negozio",
-            2: "La Piadineria",
-            3: "UGC Cinema",
-            4: "Lago di Viverone",
-            5: "Bar Noce",
-            6: "Mondo Juve",
-            7: "Follonica",
-            8: "Alambicco",
-            9: "Camping Thaiti",
-            10: "Lago di Avigliana",
-            11: "Via Trento",
-            12: "Casa di Davide",
-            13: "Casa di Formi",
-            14: "Castello di Monca",
-            15: "Gasprin",
-            16: "Casa di Pepe",
-            17: "Roadhouse",
-            18: "Casa Dema",
-            19: "Genova",
-            20: "Bowling Playcity",
-            21: "Castiglione della Pescaia",
-            22: "Porco Rosso",
-            23: "Mondo di Miyazaki",
-            24: "Pecetto"
+            1: "Negozio",                       //suono -> MAIN
+            2: "La Piadineria",                 //suono -> CUSTOM: The Less I Know The Better, Tame Impala
+            3: "UGC Cinema",                    //suono -> MAIN
+            4: "Lago di Viverone",              //suono -> CUSTOM: Chamber of Reflection, Mac DeMarco
+            5: "Bar Noce",                      //suono -> MAIN 
+            6: "Mondo Juve",                    //suono -> MAIN 
+            7: "Follonica",                     //suono -> MAIN
+            8: "Alambicco",                     //suono -> MAIN
+            9: "Camping Thaiti",                //suono -> MAIN
+            10: "Lago di Avigliana",            //suono -> CUSTOM: Friday I'm In Love, The Cure
+            11: "Via Trento",                   //suono -> MAIN
+            12: "Casa di Davide",               //suono -> MAIN
+            13: "Casa di Formi",                //suono -> CUSTOM: I Don't Know How To Love, The Drums 
+            14: "Castello di Monca",            //suono -> CUSTOM: The Line, 21 Pilots
+            15: "Gasprin",                      //suono -> MAIN
+            16: "Casa di Pepe",                 //suono -> MAIN
+            17: "Roadhouse",                    //suono -> MAIN
+            18: "Casa Dema",                    //suono -> MAIN
+            19: "Genova",                       //suono -> CUSTOM: Silver Soul, Beach House
+            20: "Bowling Playcity",             //suono -> MAIN
+            21: "Castiglione della Pescaia",    //suono -> MAIN
+            22: "Porco Rosso",                  //suono -> MAIN
+            23: "Mondo di Miyazaki",            //suono -> CUSTOM: Bygone Days, Joe Hisaishi
+            24: "Pecetto"                       //suono -> CUSTOM: Joe Hisaishi, 
         },
         doorPositions: {},
         doorColors: {},
@@ -567,10 +567,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 solved: false
             };
         }
-        /* RI ATTIVARE PER TEST
+
         for (let i = 1; i <= 24; i++) {
             chests[i].solved = true; // solo per test toglier epoi
-        }*/
+        }
     }
 
     function initializeDoorAttributes() {

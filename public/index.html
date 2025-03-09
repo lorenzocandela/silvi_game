@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SILVI - Pixel Game</title>
+    <title>SILVI</title>
     
     <!-- meta x pwa-->
     <meta name="description" content="Un'avventura a pixel art con puzzle ed esplorazione">
@@ -12,13 +12,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SILVI">
     
-    <!-- Icone *da aggiustare -->
+    <!-- icon *da aggiustare -->
     <link rel="apple-touch-icon" href="/assets/logo.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/assets/logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/assets/logo.png">
     
-    <!-- Favicon *da aggiustare-->
+    <!-- favicon *da aggiustare-->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.png">
     <link rel="shortcut icon" href="/assets/logo.png">
     
@@ -98,13 +98,19 @@
     </div>
     <div id="puzzleStatus" class="puzzle-unsolved">Risolvi gli enigmi per sbloccare i portali</div>
 
+    <!-- main-->
     <script src="/socket.io/socket.io.js"></script>
     <script src="/src/pwa.js"></script>
+
+    <!-- custom script -->
     <script src="/src/joinare.js"></script>
     <script src="/src/main.js"></script>
     <script src="/src/joystick.js"></script>
+    <script src="/src/audio-controller.js"></script>
     
+    <!-- fase test + controllo su autoplay errato -->
     <script>
+        // ### TEST
         document.addEventListener('DOMContentLoaded', function() {
             const splashScreen = document.getElementById('splashScreen');
             const loadingProgress = document.getElementById('loadingProgress');
@@ -132,6 +138,20 @@
                 document.removeEventListener('click', speedUp);
             });
         });
+        // ### TEST
+
+        // valutare se rimuovere dopo aver testato che funziona in più casi d'uso
+        function enableAudio() {
+            if (window.audioManager) {
+                window.audioManager.startAudio();
+            }
+            document.removeEventListener('click', enableAudio);
+            document.removeEventListener('touchstart', enableAudio);
+            document.removeEventListener('keydown', enableAudio);
+        }
+        document.addEventListener('click', enableAudio);
+        document.addEventListener('touchstart', enableAudio);
+        document.addEventListener('keydown', enableAudio);
     </script>
 </body>
 </html>
