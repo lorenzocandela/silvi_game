@@ -1,8 +1,12 @@
 @font-face {
     font-family: 'retropix';
-    src: url(./assets/font/retropix.ttf);
+    src: url(./assets/font/slkscre.ttf);
 }
 
+@font-face {
+    font-family: 'retropix-bold';
+    src: url(./assets/font/slkscrb.ttf);
+}
 * {
     font-family: 'retropix' !important;
 }
