@@ -23,30 +23,37 @@ document.addEventListener('DOMContentLoaded', function() {
     window.chestImage = chestImage;
     window.floorImage = floorImage;
 
+    // Set up game container for visual effects
+    const gameContainer = document.getElementById('gameCanvas').parentElement;
+    gameContainer.style.position = 'relative';
+    gameContainer.style.overflow = 'hidden';
+    gameContainer.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.6)';
+    gameContainer.style.backgroundColor = '#111';
+    gameContainer.style.padding = '15px';
+
+    // Create offscreen canvas
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
     const offscreenCtx = offscreenCanvas.getContext('2d');
 
-    const gameContainer = document.getElementById('gameCanvas').parentElement;
-    gameContainer.style.position = 'relative';
-    gameContainer.style.overflow = 'hidden';
-    gameContainer.style.borderRadius = '20px';
-    gameContainer.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.6)';
-    gameContainer.style.backgroundColor = '#111';
-    gameContainer.style.padding = '15px';
+    // Create darkness overlay canvas
+    const darknessCanvas = document.createElement('canvas');
+    darknessCanvas.id = 'darknessOverlay';
+    darknessCanvas.width = canvas.width;
+    darknessCanvas.height = canvas.height;
+    darknessCanvas.style.position = 'absolute';
+    darknessCanvas.style.marginTop = '35px';
+    gameContainer.appendChild(darknessCanvas);
+    
+    // Get the context for the darkness canvas
+    const darknessCtx = darknessCanvas.getContext('2d');
 
-    const floorImages = {
-        // 1: '/assets/floor1.png',
-        // 2: '/assets/floor2.png',
-        // Altre stanze...
-    };
-
+    // Add CRT style
     const crtStyle = document.createElement('style');
     crtStyle.textContent = `
         #gameCanvas {
             position: relative;
-            border-radius: 20px;
             transform: scale(0.98); /* Slight scale for curved effect */
             filter: 
                 brightness(1.1)
@@ -72,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
             background-size: 100% 4px;
             z-index: 1000;
             pointer-events: none;
-            border-radius: 20px;
             opacity: 0.3;
         }
         
@@ -88,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 inset 0 0 10px rgba(0, 255, 0, 0.4);
             z-index: 1001;
             pointer-events: none;
-            border-radius: 20px;
         }
         
         #crtVignette {
@@ -104,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
             );
             z-index: 999;
             pointer-events: none;
-            border-radius: 20px;
         }
     
         /* TV frame */
@@ -114,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
             left: -20px;
             right: -20px;
             bottom: -20px;
-            border-radius: 30px;
             background-color: #222;
             z-index: -1;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
@@ -132,96 +135,259 @@ document.addEventListener('DOMContentLoaded', function() {
             opacity: 0.1;
             z-index: 998;
             pointer-events: none;
-            border-radius: 20px;
+        }
+        
+        /* Question box styles */
+        #questionBox {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+            background-color: #111;
+            border: 4px solid #00aa00;
+            border-radius: 8px;
+            color: #00ff00;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            z-index: 2000;
+            text-align: center;
+        }
+        
+        #questionBox h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+        
+        #questionBox p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        #answerOptions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .answer-button {
+            background-color: #004400;
+            color: #00ff00;
+            border: 2px solid #00aa00;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .answer-button:hover {
+            background-color: #006600;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .answer-button.correct {
+            background-color: #008800;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+        
+        .answer-button.incorrect {
+            background-color: #880000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            border-color: #aa0000;
         }
     `;
     document.head.appendChild(crtStyle);
-    
-    // Random flicker effect
-    function randomFlicker() {
-        if (Math.random() > 0.97) {
-            canvas.style.opacity = '0.87';
-            canvas.style.filter = 'brightness(1.1) contrast(1.2) sepia(0.2) hue-rotate(40deg) saturate(1.5) blur(1px)';
-            setTimeout(() => {
-                canvas.style.opacity = '1';
-                canvas.style.filter = 'brightness(1.1) contrast(1.2) sepia(0.2) hue-rotate(40deg) saturate(1.5)';
-            }, 50 + Math.random() * 50);
-        }
-        
-        requestAnimationFrame(randomFlicker);
-    }
-    randomFlicker();
-    
-    const originalRenderGame = window.renderGame;
-    window.renderGame = function() {
-        // Save the current context state
-        ctx.save();
-        
-        // Clear the canvas with a dark background
-        ctx.fillStyle = '#001100';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Call the original render function
-        originalRenderGame();
-        
-        // Restore the context state
-        ctx.restore();
-    }; 
 
-    // Add random noise occasionally
-    function addRandomNoise() {
-        if (Math.random() > 0.98) {
-            ctx.save();
-            ctx.globalAlpha = 0.03;
-            for (let i = 0; i < 20; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const width = Math.random() * 5 + 1;
-                const height = Math.random() * 2 + 1;
-                ctx.fillStyle = '#00ff00';
-                ctx.fillRect(x, y, width, height);
-            }
-            ctx.restore();
-        }
-        
-        setTimeout(addRandomNoise, 200);
-    }
-    addRandomNoise();
+    // Light properties
+    const lightSettings = {
+        radius: 80,         // Size of the light circle
+        softness: 30,       // Edge softness
+        intensity: 0.9,     // Light intensity (1 = full bright, 0 = no light)
+        flicker: true,      // Whether the light flickers
+        flickerRange: 0.1,  // How much the light flickers
+        color: 'rgba(0, 255, 0, 0.4)' // Light color with green tint
+    };
 
-// Change the colors of everything to green-ish
-function convertToGreenPhosphor() {
-    // Update player sprite colors
-    if (window.player && window.player.color) {
-        window.player.color = '#00ff00';
-    }
-    
-    // Update chest colors
-    for (const roomId in chests) {
-        if (chests[roomId].color) {
-            chests[roomId].color = '#00aa00';
+    // Question system - configure questions and answers for each room
+    const questions = {
+        1: {
+            question: "Welcome to the adventure! What's your favorite color?",
+            answers: ["Green", "Blue", "Red", "Yellow"],
+            correctIndex: 0, // Green is always correct for the first room
+            explanation: "Green is the color of adventure! Welcome to your journey."
+        },
+        2: {
+            question: "What is the capital of France?",
+            answers: ["London", "Berlin", "Paris", "Madrid"],
+            correctIndex: 2,
+            explanation: "Paris is the capital of France."
+        },
+        3: {
+            question: "What is 2 + 2?",
+            answers: ["3", "4", "5", "22"],
+            correctIndex: 1,
+            explanation: "2 + 2 = 4"
+        },
+        4: {
+            question: "Which planet is known as the Red Planet?",
+            answers: ["Earth", "Venus", "Mars", "Jupiter"],
+            correctIndex: 2,
+            explanation: "Mars is known as the Red Planet due to its reddish appearance."
+        },
+        5: {
+            question: "Who wrote 'Romeo and Juliet'?",
+            answers: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+            correctIndex: 1,
+            explanation: "William Shakespeare wrote 'Romeo and Juliet'."
+        },
+        6: {
+            question: "What is the largest ocean on Earth?",
+            answers: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+            correctIndex: 3,
+            explanation: "The Pacific Ocean is the largest ocean on Earth."
+        },
+        7: {
+            question: "Which element has the chemical symbol 'O'?",
+            answers: ["Oxygen", "Gold", "Silver", "Osmium"],
+            correctIndex: 0,
+            explanation: "Oxygen has the chemical symbol 'O'."
+        },
+        8: {
+            question: "How many sides does a hexagon have?",
+            answers: ["5", "6", "7", "8"],
+            correctIndex: 1,
+            explanation: "A hexagon has 6 sides."
+        },
+        9: {
+            question: "What is the closest star to Earth?",
+            answers: ["Proxima Centauri", "Alpha Centauri", "Polaris", "The Sun"],
+            correctIndex: 3,
+            explanation: "The Sun is the closest star to Earth."
+        },
+        10: {
+            question: "Which animal is known as the 'King of the Jungle'?",
+            answers: ["Tiger", "Elephant", "Lion", "Giraffe"],
+            correctIndex: 2,
+            explanation: "The Lion is known as the 'King of the Jungle'."
+        },
+        11: {
+            question: "What is the largest planet in our solar system?",
+            answers: ["Earth", "Saturn", "Jupiter", "Neptune"],
+            correctIndex: 2,
+            explanation: "Jupiter is the largest planet in our solar system."
+        },
+        12: {
+            question: "Which of these is NOT a programming language?",
+            answers: ["Java", "Python", "Cobra", "HTML"],
+            correctIndex: 3,
+            explanation: "HTML is a markup language, not a programming language."
+        },
+        13: {
+            question: "What is the capital of Japan?",
+            answers: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+            correctIndex: 2,
+            explanation: "Tokyo is the capital of Japan."
+        },
+        14: {
+            question: "Which instrument has 88 keys?",
+            answers: ["Guitar", "Violin", "Drums", "Piano"],
+            correctIndex: 3,
+            explanation: "A standard piano has 88 keys."
+        },
+        15: {
+            question: "What is the hardest natural substance on Earth?",
+            answers: ["Diamond", "Gold", "Iron", "Steel"],
+            correctIndex: 0,
+            explanation: "Diamond is the hardest natural substance on Earth."
+        },
+        16: {
+            question: "How many continents are there on Earth?",
+            answers: ["5", "6", "7", "8"],
+            correctIndex: 2,
+            explanation: "There are 7 continents on Earth."
+        },
+        17: {
+            question: "Who painted the Mona Lisa?",
+            answers: ["Van Gogh", "Da Vinci", "Picasso", "Michelangelo"],
+            correctIndex: 1,
+            explanation: "Leonardo Da Vinci painted the Mona Lisa."
+        },
+        18: {
+            question: "What's the smallest prime number?",
+            answers: ["0", "1", "2", "3"],
+            correctIndex: 2,
+            explanation: "2 is the smallest prime number."
+        },
+        19: {
+            question: "Which of these is NOT a noble gas?",
+            answers: ["Helium", "Neon", "Chlorine", "Argon"],
+            correctIndex: 2,
+            explanation: "Chlorine is a halogen, not a noble gas."
+        },
+        20: {
+            question: "What's the capital of Australia?",
+            answers: ["Sydney", "Melbourne", "Perth", "Canberra"],
+            correctIndex: 3,
+            explanation: "Canberra is the capital of Australia, not Sydney."
+        },
+        21: {
+            question: "Which animal is known for its black and white stripes?",
+            answers: ["Giraffe", "Zebra", "Tiger", "Panda"],
+            correctIndex: 1,
+            explanation: "Zebras are known for their distinctive black and white stripes."
+        },
+        22: {
+            question: "What is the most spoken language in the world?",
+            answers: ["English", "Spanish", "Hindi", "Mandarin"],
+            correctIndex: 3,
+            explanation: "Mandarin Chinese is the most spoken language in the world."
+        },
+        23: {
+            question: "Which of these is NOT a primary color?",
+            answers: ["Red", "Blue", "Green", "Yellow"],
+            correctIndex: 3,
+            explanation: "Yellow is a primary color in pigment but not in light (RGB)."
+        },
+        24: {
+            question: "What is the final test. What lies beyond knowledge?",
+            answers: ["Power", "Wisdom", "Truth", "Understanding"],
+            correctIndex: 1,
+            explanation: "With knowledge comes wisdom, the ultimate treasure."
         }
-    }
-    
-    // Update text colors
-    const textElements = document.querySelectorAll('.puzzle-solved, .puzzle-unsolved, #roomName, #timer');
-    textElements.forEach(el => {
-        el.style.color = '#00ff00';
-        el.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7)';
-    });
-    
-    // Update game UI
-    document.body.style.backgroundColor = '#111';
-    const controlsDiv = document.querySelector('.controls');
-    if (controlsDiv) {
-        controlsDiv.style.backgroundColor = '#222';
-        controlsDiv.querySelectorAll('button').forEach(btn => {
-            btn.style.backgroundColor = '#004400';
-            btn.style.color = '#00ff00';
-            btn.style.borderColor = '#00aa00';
-        });
-    }
-}
-setTimeout(convertToGreenPhosphor, 100);
+    };
+
+    const floorImages = {
+        1: '/assets/floor1.png',
+        2: '/assets/floor2.png',
+        3: '/assets/floor3.png',
+        4: '/assets/floor1.png',
+        5: '/assets/floor2.png',
+        6: '/assets/floor3.png',
+        7: '/assets/floor1.png',
+        8: '/assets/floor2.png',
+        9: '/assets/floor3.png',
+        10: '/assets/floor1.png',
+        11: '/assets/floor2.png',
+        12: '/assets/floor3.png',
+        13: '/assets/floor1.png',
+        14: '/assets/floor2.png',
+        15: '/assets/floor3.png',
+        16: '/assets/floor1.png',
+        17: '/assets/floor2.png',
+        18: '/assets/floor3.png',
+        19: '/assets/floor1.png',
+        20: '/assets/floor2.png',
+        21: '/assets/floor3.png',
+        22: '/assets/floor1.png',
+        23: '/assets/floor2.png',
+        24: '/assets/floor3.png',
+    };
 
     const floorImagesLoaded = {};
 
@@ -244,7 +410,6 @@ setTimeout(convertToGreenPhosphor, 100);
 
     const roomSystem = {
         connections: {
-
             1: [2, 5, 6], 
             2: [1, 3, 7], 
             3: [2, 4, 8], 
@@ -277,7 +442,6 @@ setTimeout(convertToGreenPhosphor, 100);
         },
         currentRoom: 1,
         roomNames: {
-
             1: "Entrance Hall",
             2: "Main Corridor",
             3: "Dusty Passage",
@@ -307,11 +471,8 @@ setTimeout(convertToGreenPhosphor, 100);
 
             24: "Treasure Chamber"
         },
-
         doorPositions: {},
-
         doorColors: {},
-
         doors: {}
     };
 
@@ -321,6 +482,7 @@ setTimeout(convertToGreenPhosphor, 100);
     let isPopupOpen = false;
     let popupText = "";
     let interactionCooldown = 0;
+    let questionBoxVisible = false;
 
     let currentDirection = 0; 
     let frameIndex = 0;
@@ -355,16 +517,13 @@ setTimeout(convertToGreenPhosphor, 100);
     };
 
     function getFloorImageForRoom(roomId) {
-
         if (floorImages[roomId] && floorImagesLoaded[roomId]) {
             return floorImagesLoaded[roomId];
         }
-
         return floorImage;
     }
 
     function loadFloorImages() {
-
         floorImage.onload = () => {
             //console.log("Immagine del pavimento di default caricata");
         };
@@ -381,22 +540,24 @@ setTimeout(convertToGreenPhosphor, 100);
 
     function initializeChests() {
         for (let roomId = 1; roomId <= 24; roomId++) {
+            const roomQuestion = questions[roomId] || questions[1]; // Fallback to room 1 if no question defined
+            
             chests[roomId] = {
                 x: canvas.width / 2 - Math.random() * 50,
                 y: canvas.height / 2 - Math.random() * 50,
                 width: 35,
                 height: 35,
-                content: `You found a secret message in ${roomSystem.roomNames[roomId] || "Room " + roomId}!`,
+                question: roomQuestion.question,
+                answers: roomQuestion.answers,
+                correctIndex: roomQuestion.correctIndex,
+                explanation: roomQuestion.explanation,
                 opened: false,
                 solved: false 
             };
         }
 
-        chests[1].content = "Welcome to your adventure! Explore all rooms to discover the secrets.";
+        // Make the first chest pre-solved for easier start
         chests[1].solved = true;
-        chests[13].content = "You found the treasure vault! But the real treasure is the knowledge you gained along the way.";
-        chests[14].content = "This hidden sanctuary contains ancient wisdom: 'The journey matters more than the destination.'";
-        chests[15].content = "15!";
     }
 
     function initializeDoorAttributes() {
@@ -476,12 +637,9 @@ setTimeout(convertToGreenPhosphor, 100);
                 roomSystem.connections[conn.to].push(conn.from);
             }
         });
-        
-        //console.log("Room connections modified to add complexity");
     }
 
     function generateDoors() {
-
         if (Object.keys(roomSystem.doorPositions).length === 0) {
             initializeDoorAttributes();
         }
@@ -532,10 +690,8 @@ setTimeout(convertToGreenPhosphor, 100);
         if (!currentChest) return;
 
         if (chestImage.complete) {
-
             ctx.drawImage(chestImage, currentChest.x, currentChest.y, currentChest.width, currentChest.height);
         } else {
-
             ctx.fillStyle = "#8B4513"; 
             ctx.fillRect(currentChest.x, currentChest.y, currentChest.width, currentChest.height);
             ctx.strokeStyle = "#000000";
@@ -595,37 +751,34 @@ setTimeout(convertToGreenPhosphor, 100);
 
             const doorLocked = !chests[roomSystem.currentRoom].solved;
 
-            if (doorImage.complete) {
+            if (doorImage.complete && lockedDoorImage.complete) {
                 if (doorLocked) {
-                    ctx.drawImage(doorImage, x, y, width, height);
-                    ctx.beginPath();
+                    // Draw locked door using the locked door image
+                    ctx.drawImage(lockedDoorImage, x, y, width, height);
                 } else {
+                    // Draw unlocked door
                     ctx.drawImage(doorImage, x, y, width, height);
                 }
             } else {
-
-                ctx.fillStyle = doorLocked ? "#FF0000" : (door.color || "#FF5722");
+                // Fallback if door images aren't loaded
+                ctx.fillStyle = doorLocked ? "#FF0000" : "#8B4513"; // Wood color for unlocked doors
                 ctx.fillRect(x, y, width, height);
 
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 4;
                 ctx.strokeRect(x, y, width, height);
 
-                ctx.fillStyle = doorLocked ? "#FF6666" : (door.color || "#FFB74D");
+                // Draw door panel
+                ctx.fillStyle = doorLocked ? "#FF6666" : "#A0522D"; // Darker wood color
                 const panelPadding = 10;
                 ctx.fillRect(x + panelPadding, y + panelPadding,
                     width - panelPadding * 2, height - panelPadding * 2);
-
-                ctx.fillStyle = "#FFFFFF";
-                ctx.font = "14px Arial";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
             }
         });
     }
 
     function drawPopup() {
-        if (!isPopupOpen) return;
+        if (!isPopupOpen || questionBoxVisible) return;
 
         ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -669,6 +822,150 @@ setTimeout(convertToGreenPhosphor, 100);
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    // Function to draw the darkness when a question is active
+    function drawQuestionDarkness() {
+        if (!questionBoxVisible) return;
+        
+        // Create complete darkness
+        darknessCtx.clearRect(0, 0, darknessCanvas.width, darknessCanvas.height);
+        darknessCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+        darknessCtx.fillRect(0, 0, darknessCanvas.width, darknessCanvas.height);
+    }
+
+    // Function to draw the darkness with a light around the player
+    function drawDarkness() {
+        if (!window.player || questionBoxVisible) return;
+        
+        // Get player center position
+        const playerCenterX = window.player.x + window.player.width / 2;
+        const playerCenterY = window.player.y + window.player.height / 2;
+        
+        // Calculate light radius with optional flicker
+        let lightRadius = lightSettings.radius;
+        if (lightSettings.flicker) {
+            const flicker = Math.random() * lightSettings.flickerRange * 2 - lightSettings.flickerRange;
+            lightRadius += flicker * lightRadius;
+        }
+        
+        // Clear the previous frame
+        darknessCtx.clearRect(0, 0, darknessCanvas.width, darknessCanvas.height);
+        
+        // Create a dark overlay with a hole for the light
+        darknessCtx.save();
+        
+        // Create darkness
+        darknessCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        darknessCtx.fillRect(0, 0, darknessCanvas.width, darknessCanvas.height);
+        
+        // Create light circle
+        darknessCtx.globalCompositeOperation = 'destination-out';
+        
+        // Create gradient for soft edges
+        const gradient = darknessCtx.createRadialGradient(
+            playerCenterX, playerCenterY, 0,
+            playerCenterX, playerCenterY, lightRadius + lightSettings.softness
+        );
+        
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); // Full transparency at center
+        gradient.addColorStop(lightSettings.intensity, 'rgba(0, 0, 0, 0.9)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Full darkness at edge
+        
+        darknessCtx.fillStyle = gradient;
+        darknessCtx.beginPath();
+        darknessCtx.arc(playerCenterX, playerCenterY, lightRadius + lightSettings.softness, 0, Math.PI * 2);
+        darknessCtx.fill();
+        
+        // Add a subtle colored glow for the light
+        darknessCtx.globalCompositeOperation = 'source-over';
+        const glowGradient = darknessCtx.createRadialGradient(
+            playerCenterX, playerCenterY, 0,
+            playerCenterX, playerCenterY, lightRadius
+        );
+        
+        glowGradient.addColorStop(0, lightSettings.color);
+        glowGradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+        
+        darknessCtx.fillStyle = glowGradient;
+        darknessCtx.beginPath();
+        darknessCtx.arc(playerCenterX, playerCenterY, lightRadius, 0, Math.PI * 2);
+        darknessCtx.fill();
+        
+        darknessCtx.restore();
+        
+        // Optional: Add some light particles for atmosphere
+        if (Math.random() > 0.8) {
+            const particleCount = Math.floor(Math.random() * 3) + 1;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * lightRadius * 0.8;
+                const particleX = playerCenterX + Math.cos(angle) * distance;
+                const particleY = playerCenterY + Math.sin(angle) * distance;
+                const size = Math.random() * 2 + 1;
+                
+                darknessCtx.fillStyle = 'rgba(100, 255, 100, 0.5)';
+                darknessCtx.beginPath();
+                darknessCtx.arc(particleX, particleY, size, 0, Math.PI * 2);
+                darknessCtx.fill();
+            }
+        }
+    }
+
+    // Random flicker effect
+    function randomFlicker() {
+        if (Math.random() > 0.97) {
+            canvas.style.opacity = '0.87';
+            canvas.style.filter = 'brightness(1.1) contrast(1.2) sepia(0.2) hue-rotate(40deg) saturate(1.5) blur(1px)';
+            canvas.style.marginTop = '35px';
+            setTimeout(() => {
+                canvas.style.opacity = '1';
+                canvas.style.filter = 'brightness(1.1) contrast(1.2) sepia(0.2) hue-rotate(40deg) saturate(1.5)';
+            }, 50 + Math.random() * 50);
+        }
+        
+        requestAnimationFrame(randomFlicker);
+    }
+    
+    // Add random noise occasionally
+    function addRandomNoise() {
+        if (Math.random() > 0.98) {
+            ctx.save();
+            ctx.globalAlpha = 0.03;
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const width = Math.random() * 5 + 1;
+                const height = Math.random() * 2 + 1;
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(x, y, width, height);
+            }
+            ctx.restore();
+        }
+        
+        setTimeout(addRandomNoise, 200);
+    }
+
+    // Change the colors of everything to green-ish
+    function convertToGreenPhosphor() {
+        // Update player sprite colors
+        if (window.player && window.player.color) {
+            window.player.color = '#00ff00';
+        }
+        
+        // Update chest colors
+        for (const roomId in chests) {
+            if (chests[roomId].color) {
+                chests[roomId].color = '#00aa00';
+            }
+        }
+        
+        // Update text colors
+        const textElements = document.querySelectorAll('.puzzle-solved, .puzzle-unsolved, #roomName, #timer');
+        textElements.forEach(el => {
+            el.style.color = '#00ff00';
+            el.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7)';
+        });
+    }
+
     function updateAnimation(deltaTime, isMoving) {
         if (isMoving) {
             animationTimer += deltaTime;
@@ -679,7 +976,6 @@ setTimeout(convertToGreenPhosphor, 100);
                 animationTimer = 0;
             }
         } else {
-
             frameIndex = 0;
             window.frameIndex = frameIndex; 
         }
@@ -691,7 +987,6 @@ setTimeout(convertToGreenPhosphor, 100);
         const fadeSpeed = 0.003; 
 
         if (transitionDirection === 'in') {
-
             transitionAlpha += fadeSpeed * deltaTime;
 
             if (transitionAlpha >= 1) {
@@ -701,7 +996,6 @@ setTimeout(convertToGreenPhosphor, 100);
                 changeRoom(transitionNewRoomId);
             }
         } else {
-
             transitionAlpha -= fadeSpeed * deltaTime;
 
             if (transitionAlpha <= 0) {
@@ -720,8 +1014,7 @@ setTimeout(convertToGreenPhosphor, 100);
     }
 
     function updateMovement() {
-
-        if (isRoomTransitioning || isPopupOpen) return false;
+        if (isRoomTransitioning || isPopupOpen || questionBoxVisible) return false;
 
         let moving = false;
 
@@ -773,22 +1066,29 @@ setTimeout(convertToGreenPhosphor, 100);
     }
 
     function renderGame() {
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         drawRoom();
-
         drawChest();
-
         drawSprite();
-
         drawPopup();
     }
 
-    window.renderGame = renderGame;
+    window.renderGame = function() {
+        // Save the current context state
+        ctx.save();
+        
+        // Clear the canvas with a dark background
+        ctx.fillStyle = '#001100';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Call the original render function
+        renderGame();
+        
+        // Restore the context state
+        ctx.restore();
+    };
 
     function showRoomTransition(newRoomId) {
-
         if (isRoomTransitioning) return;
 
         isRoomTransitioning = true;
@@ -856,7 +1156,7 @@ setTimeout(convertToGreenPhosphor, 100);
             });
         }
 
-        if (parseInt(newRoomId) === 15 && !window.isMultiplayer) {
+        if (parseInt(newRoomId) === 24 && !window.isMultiplayer) {
             showVictoryMessage();
         }
     }
@@ -896,17 +1196,147 @@ setTimeout(convertToGreenPhosphor, 100);
         return distanceX < 40 && distanceY < 40;
     }
 
-    function handleInteraction() {
-        if (isRoomTransitioning || isPopupOpen) return;
-        if (interactionCooldown > 0) return;
-        interactionCooldown = 500; 
-        if (isPlayerNearChest()) {
+    // Function to show the question box
+    function showQuestionBox() {
+        if (questionBoxVisible) return;
+        
+        const currentChest = chests[roomSystem.currentRoom];
+        if (!currentChest) return;
+        
+        questionBoxVisible = true;
+        
+        // Create question box
+        const questionBox = document.createElement('div');
+        questionBox.id = 'questionBox';
+        
+        // Room name and question
+        questionBox.innerHTML = `
+            <h2>${roomSystem.roomNames[roomSystem.currentRoom]}</h2>
+            <p>${currentChest.question}</p>
+            <div id="answerOptions"></div>
+        `;
+        
+        document.body.appendChild(questionBox);
+        
+        // Add answer options
+        const answerOptions = document.getElementById('answerOptions');
+        
+        currentChest.answers.forEach((answer, index) => {
+            const button = document.createElement('button');
+            button.className = 'answer-button';
+            button.textContent = answer;
+            button.dataset.index = index;
+            
+            button.addEventListener('click', function() {
+                handleAnswerClick(parseInt(this.dataset.index));
+            });
+            
+            answerOptions.appendChild(button);
+        });
+        
+        // Make sure the canvas still has focus for keyboard events
+        canvas.focus();
+        
+        // Update darkness for question mode
+        drawQuestionDarkness();
+    }
+
+    // Function to handle answer clicks
+    function handleAnswerClick(answerIndex) {
+        const currentChest = chests[roomSystem.currentRoom];
+        const answerButtons = document.querySelectorAll('.answer-button');
+        
+        // Disable all buttons to prevent multiple clicks
+        answerButtons.forEach(button => {
+            button.disabled = true;
+        });
+        
+        // Highlight the correct and incorrect answers
+        answerButtons.forEach((button, index) => {
+            if (index === currentChest.correctIndex) {
+                button.classList.add('correct');
+            } else if (index === answerIndex && answerIndex !== currentChest.correctIndex) {
+                button.classList.add('incorrect');
+            }
+        });
+        
+        if (answerIndex === currentChest.correctIndex) {
+            // Correct answer
+            setTimeout(() => {
+                // Add explanation to the question box
+                const questionBox = document.getElementById('questionBox');
+                questionBox.innerHTML += `
+                    <p style="color: #00ff00; margin-top: 20px;">${currentChest.explanation}</p>
+                    <button id="continueButton" class="answer-button" style="margin-top: 20px;">Continue</button>
+                `;
+                
+                document.getElementById('continueButton').addEventListener('click', function() {
+                    closeQuestionBox(true);
+                });
+            }, 1000);
+        } else {
+            // Incorrect answer
+            setTimeout(() => {
+                // Add try again button
+                const questionBox = document.getElementById('questionBox');
+                questionBox.innerHTML += `
+                    <p style="color: #ff6666; margin-top: 20px;">Incorrect. Try again!</p>
+                    <button id="tryAgainButton" class="answer-button" style="margin-top: 20px;">Try Again</button>
+                `;
+                
+                document.getElementById('tryAgainButton').addEventListener('click', function() {
+                    // Recreate the question box
+                    document.body.removeChild(questionBox);
+                    questionBoxVisible = false;
+                    showQuestionBox();
+                });
+            }, 1000);
+        }
+    }
+
+    // Function to close the question box
+    function closeQuestionBox(solved) {
+        const questionBox = document.getElementById('questionBox');
+        if (questionBox) {
+            document.body.removeChild(questionBox);
+        }
+        
+        questionBoxVisible = false;
+        
+        if (solved) {
+            // Mark the chest as solved
             const currentChest = chests[roomSystem.currentRoom];
             currentChest.opened = true;
             currentChest.solved = true;
-            isPopupOpen = true;
-            popupText = currentChest.content;
+            
+            // Show success message
             updatePuzzleStatus();
+            
+            // Increase light radius temporarily to celebrate
+            const originalRadius = lightSettings.radius;
+            lightSettings.radius = originalRadius * 2;
+            
+            setTimeout(() => {
+                lightSettings.radius = originalRadius;
+            }, 1500);
+        }
+    }
+
+    function handleInteraction() {
+        if (isRoomTransitioning || isPopupOpen || questionBoxVisible) return;
+        if (interactionCooldown > 0) return;
+        
+        interactionCooldown = 500; 
+        
+        if (isPlayerNearChest()) {
+            const currentChest = chests[roomSystem.currentRoom];
+            
+            if (currentChest.solved) {
+                // If already solved, do nothing
+            } else {
+                // Show question
+                showQuestionBox();
+            }
         }
     }
 
@@ -944,7 +1374,7 @@ setTimeout(convertToGreenPhosphor, 100);
     }
 
     function handlePopupClick(e) {
-        if (!isPopupOpen) return;
+        if (!isPopupOpen || questionBoxVisible) return;
 
         const rect = canvas.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -971,12 +1401,18 @@ setTimeout(convertToGreenPhosphor, 100);
         const isMoving = updateMovement();
         updateAnimation(deltaTime, isMoving);
         updateTransition(deltaTime);
+        
+        if (questionBoxVisible) {
+            drawQuestionDarkness();
+        } else {
+            drawDarkness();
+        }
 
         if (!timerPaused) {
             updateTimerDisplay();
         }
 
-        renderGame();
+        window.renderGame();
         drawTransition();
 
         if (window.isMultiplayer && typeof window.drawOtherPlayer === 'function') {
@@ -1030,14 +1466,22 @@ setTimeout(convertToGreenPhosphor, 100);
         roomSystem.currentRoom = 1;
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height / 2 - player.height / 2;
-        for (let roomId = 2; roomId <= 15; roomId++) {
+        for (let roomId = 2; roomId <= 24; roomId++) {
             if (chests[roomId]) {
                 chests[roomId].opened = false;
                 chests[roomId].solved = false;
             }
         }
+        // Make room 1 always solved
+        chests[1].solved = true;
+        
         initTimer();
         updatePuzzleStatus();
+        
+        // Close any open question box
+        if (questionBoxVisible) {
+            closeQuestionBox(false);
+        }
     }
 
     function move(direction) {
@@ -1057,7 +1501,6 @@ setTimeout(convertToGreenPhosphor, 100);
         if (direction) {
             buttonPressed[direction] = false;
         } else {
-
             buttonPressed.up = false;
             buttonPressed.down = false;
             buttonPressed.left = false;
@@ -1067,32 +1510,51 @@ setTimeout(convertToGreenPhosphor, 100);
 
     window.stopMove = stopMove;
 
+    // Function to update questions and answers (for code modification)
+    window.updateQuestionData = function(roomId, questionData) {
+        if (!roomId || !questionData) return false;
+        
+        // Update the questions object
+        questions[roomId] = {
+            question: questionData.question || "Default question?",
+            answers: questionData.answers || ["Yes", "No", "Maybe", "I don't know"],
+            correctIndex: questionData.correctIndex || 0,
+            explanation: questionData.explanation || "That's correct!"
+        };
+        
+        // Update chest if already initialized
+        if (chests[roomId]) {
+            chests[roomId].question = questions[roomId].question;
+            chests[roomId].answers = questions[roomId].answers;
+            chests[roomId].correctIndex = questions[roomId].correctIndex;
+            chests[roomId].explanation = questions[roomId].explanation;
+        }
+        
+        return true;
+    };
+
     function initGame() {
-        //console.log("Initializing game...");
-
         loadFloorImages();
-
         initializeChests();
-
         addDeadEndsAndModifyConnections();
-
         generateDoors();
-
-        ////console.log("Doors generated for rooms:", Object.keys(roomSystem.doors));
-        ////console.log("Current room:", roomSystem.currentRoom);
-        //console.log("Doors in current room:", roomSystem.doors[roomSystem.currentRoom]);
 
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height / 2 - player.height / 2;
 
         canvas.addEventListener('click', handlePopupClick);
-
         initTimer();
-
         updatePuzzleStatus();
+        
+        // Start visual effects
+        randomFlicker();
+        addRandomNoise();
+        setTimeout(convertToGreenPhosphor, 100);
+        
+        // Render initial game state
+        window.renderGame();
 
-        renderGame();
-
+        // Start game loop
         lastTime = 0;
         requestAnimationFrame(gameLoop);
     }
@@ -1111,91 +1573,18 @@ setTimeout(convertToGreenPhosphor, 100);
         }
     });
 
-    const buttons = document.querySelectorAll('.controls button');
-    buttons.forEach(button => {
-
-        button.addEventListener('mousedown', () => {
-            const direction = button.getAttribute('data-direction');
-            if (direction) {
-                move(direction);
-            }
-        });
-
-        button.addEventListener('mouseup', () => {
-            const direction = button.getAttribute('data-direction');
-            if (direction) {
-                stopMove(direction);
-            }
-        });
-
-        button.addEventListener('mouseleave', () => {
-            const direction = button.getAttribute('data-direction');
-            if (direction) {
-                stopMove(direction);
-            }
-        });
-
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const direction = button.getAttribute('data-direction');
-            if (direction) {
-                move(direction);
-            }
-        });
-
-        button.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            const direction = button.getAttribute('data-direction');
-            if (direction) {
-                stopMove(direction);
-            }
-        });
-    });
-
-    const controlsDiv = document.querySelector('.controls');
-    if (controlsDiv) {
-        const interactButton = document.createElement('button');
-        interactButton.textContent = 'Interagisci';
-        interactButton.className = 'interact-button';
-
-        interactButton.addEventListener('mousedown', function() {
-            buttonPressed.interact = true;
-        });
-
-        interactButton.addEventListener('mouseup', function() {
-            buttonPressed.interact = false;
-        });
-
-        interactButton.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            buttonPressed.interact = true;
-        });
-
-        interactButton.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            buttonPressed.interact = false;
-        });
-
-        controlsDiv.appendChild(interactButton);
-    }
-
     window.debugRoom = function() {
-        //console.log("Debug: Forcing room display");
         renderGame();
     };
 
     if (typeof window.skipMainInit === 'undefined' || !window.skipMainInit) {
-        //console.log("Initializing single player game");
 
         if (playerSprite.complete) {
             initGame();
         } else {
             playerSprite.onload = () => {
-                //console.log("Sprite loaded!");
                 initGame();
             };
         }
-    } else {
-        //console.log("Waiting for multiplayer initialization");
     }
 });

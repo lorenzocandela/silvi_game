@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'retropix';
+    src: url(./assets/font/slkscre.ttf);
+}
+
+@font-face {
+    font-family: 'retropix-bold';
+    src: url(./assets/font/slkscrb.ttf);
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -9,13 +19,10 @@ body {
     overflow: hidden !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-}
-canvas {
-    border: 4px solid white;
-    background-color: #222;
+    font-family: 'retropix' !important;
 }
 .controls {
-    margin-top: 10px;
+    margin-top: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,9 +42,7 @@ button {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(139, 69, 19, 0.7);
     padding: 5px 15px;
-    border-radius: 10px;
     text-align: center;
     z-index: 10;
     pointer-events: none;
@@ -45,9 +50,9 @@ button {
 
 .room-name h2 {
     margin: 0;
-    color: #f0e0c0;
-    font-family: 'Arial', sans-serif;
-    font-size: 18px;
+    font-family: 'retropix-bold' !important;
+    font-size: 15px;
+    width: 270px;
 }
 .victory-overlay {
     position: fixed;
@@ -65,7 +70,6 @@ button {
 .victory-content {
     background-color: #f0e0c0;
     padding: 20px;
-    border-radius: 10px;
     text-align: center;
     border: 5px solid #8B4513;
 }
@@ -80,7 +84,6 @@ button {
     color: #f0e0c0;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
@@ -89,20 +92,19 @@ button {
 .victory-content button:hover {
     background-color: #a05c2c;
 }
+
 .game-timer {
     position: absolute;
-    top: 50px;
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
+    bottom: 207px;
     color: #ffffff;
     padding: 5px 10px;
-    border-radius: 5px;
     font-family: 'Arial', sans-serif;
     font-size: 20px;
     z-index: 10;
 }
 
 .puzzle-solved {
+    display: none !important; /* DA MODIFICARE ORA SOLO PER TEST */
     position: absolute;
     top: 10px;
     left: 50%;
@@ -111,13 +113,13 @@ button {
     background-color: rgba(0, 128, 0, 0.7);
     color: #ffffff;
     padding: 5px 10px;
-    border-radius: 5px;
     font-family: 'Arial', sans-serif;
     font-size: 14px;
     z-index: 10;
 }
 
 .puzzle-unsolved {
+    display: none !important; /* DA MODIFICARE ORA SOLO PER TEST */
     position: absolute;
     top: 10px;
     left: 50%;
@@ -126,7 +128,6 @@ button {
     background-color: rgba(255, 0, 0, 0.7);
     color: #ffffff;
     padding: 5px 10px;
-    border-radius: 5px;
     font-family: 'Arial', sans-serif;
     font-size: 14px;
     z-index: 10;
@@ -145,3 +146,125 @@ button {
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+
+
+/* ############# JOYSTICK ############# */
+/* Add to style.css or create a new file called joystick-controls.css */
+
+.game-controls-container {
+    position: fixed;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.joystick-container {
+    pointer-events: auto;
+}
+
+.joystick-base {
+    width: 120px;
+    height: 120px;
+    background-color: rgba(0, 68, 0, 0.3);
+    border: 2px solid rgba(0, 170, 0, 0.5);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    touch-action: none;
+}
+
+.joystick-handle {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 68, 0, 0.7);
+    border: 2px solid #00aa00;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    touch-action: none;
+}
+
+.x-button-container {
+    margin-right: 20px;
+    pointer-events: auto;
+}
+
+.x-button {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(0, 68, 0, 0.7);
+    border: 2px solid #00aa00;
+    border-radius: 50%;
+    color: #00ff00;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: manipulation;
+}
+
+.x-button:active, .x-button.pressed {
+    background-color: rgba(0, 100, 0, 0.9);
+    transform: scale(0.95);
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .joystick-base {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .joystick-handle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .x-button {
+        width: 70px;
+        height: 70px;
+        font-size: 26px;
+    }
+}
+
+/* Make sure the game controls don't block the timer */
+.game-timer {
+    z-index: 1001;
+}
+
+/* CRT filter for controls to match the game aesthetic */
+.joystick-base, .x-button {
+    position: relative;
+}
+
+.joystick-base::after, .x-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.2;
+    border-radius: 50%;
+}
+/* ############# JOYSTICK ############# */

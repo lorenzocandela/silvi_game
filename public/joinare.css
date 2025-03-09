@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'retropix';
+    src: url(./assets/font/retropix.ttf);
+}
+
+* {
+    font-family: 'retropix' !important;
+}
+
 .menu-container {
     position: fixed;
     top: 0;
@@ -12,17 +21,15 @@
 }
 
 .menu-content {
-    background-color: #f0e0c0;
     padding: 30px;
     border-radius: 10px;
     text-align: center;
-    border: 5px solid #8B4513;
     max-width: 500px;
     width: 80%;
 }
 
 .menu-content h1 {
-    color: #8B4513;
+    color: #004400;
     margin-top: 0;
     font-size: 28px;
     margin-bottom: 30px;
@@ -34,24 +41,27 @@
     gap: 15px;
 }
 
+.menu-content button:hover {
+    background-color: #37e03a;
+}
+
+h3, p {
+    color: #004400;
+}
+
 .menu-content button {
-    background-color: #8B4513;
-    color: #f0e0c0;
+    background-color: #004400;
+    color: #068606;
     border: none;
     padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 35px;
     width: 100%;
     font-size: 16px;
     transition: background-color 0.3s;
 }
 
-.menu-content button:hover {
-    background-color: #a05c2c;
-}
-
 .menu-content button:disabled {
-    background-color: #cccccc;
+    background-color: #004400;
     cursor: not-allowed;
 }
 
@@ -62,12 +72,21 @@
     gap: 10px;
 }
 
+.join-form input::placeholder {
+    color: #004400;
+}
+
+
 .join-form input {
     padding: 10px;
-    border: 2px solid #8B4513;
+    border: 2px solid #004400;
     border-radius: 5px;
+    background: #058205;
     font-size: 18px;
+    margin-bottom: 20px;
     text-align: center;
+    color: #022602;
+    width: 70%;
     text-transform: uppercase;
     letter-spacing: 5px;
 }
@@ -79,13 +98,13 @@
 .game-code-value {
     font-size: 36px;
     font-weight: bold;
-    color: #8B4513;
+    color: #004400;
     letter-spacing: 5px;
     margin: 20px 0;
-    background-color: #fff9e6;
+    background-color: #058608;
     padding: 10px;
     border-radius: 5px;
-    border: 2px dashed #8B4513;
+    border: 2px dashed #004400;
 }
 
 .error-message {
