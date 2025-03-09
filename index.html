@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SILVI - Pixel Game</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/joinare.css">
+</head>
+<body>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+    <div id="roomNameContainer" class="room-name">
+        <h2 id="roomName"></h2>
+    </div>
+    <div id="timerContainer" class="game-timer">
+        <span id="timer">30:00</span>
+    </div>
+    <div id="puzzleStatus" class="puzzle-unsolved">Find and solve the chest puzzle to unlock doors</div>
+    <div class="controls">
+        <button data-direction="up">▲</button>
+        <div class="row">
+            <button data-direction="left">◄</button>
+            <button data-direction="right">►</button>
+        </div>
+        <button data-direction="down">▼</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/src/joinare.js"></script>
+    <script src="/src/main.js"></script>
+</body>
+</html>

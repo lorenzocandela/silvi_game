@@ -964,6 +964,21 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.color = '#00ff00';
             el.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7)';
         });
+<<<<<<< HEAD
+=======
+        
+        // Update game UI
+        document.body.style.backgroundColor = '#111';
+        const controlsDiv = document.querySelector('.controls');
+        if (controlsDiv) {
+            controlsDiv.style.backgroundColor = '#222';
+            controlsDiv.querySelectorAll('button').forEach(btn => {
+                btn.style.backgroundColor = '#004400';
+                btn.style.color = '#00ff00';
+                btn.style.borderColor = '#00aa00';
+            });
+        }
+>>>>>>> a9a83d16a773600268dce6541d8417144f1089da
     }
 
     function updateAnimation(deltaTime, isMoving) {
@@ -1573,6 +1588,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+<<<<<<< HEAD
+=======
+    const buttons = document.querySelectorAll('.controls button');
+    buttons.forEach(button => {
+        button.addEventListener('mousedown', () => {
+            const direction = button.getAttribute('data-direction');
+            if (direction) {
+                move(direction);
+            }
+        });
+
+        button.addEventListener('mouseup', () => {
+            const direction = button.getAttribute('data-direction');
+            if (direction) {
+                stopMove(direction);
+            }
+        });
+
+        button.addEventListener('mouseleave', () => {
+            const direction = button.getAttribute('data-direction');
+            if (direction) {
+                stopMove(direction);
+            }
+        });
+
+        button.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const direction = button.getAttribute('data-direction');
+            if (direction) {
+                move(direction);
+            }
+        });
+
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const direction = button.getAttribute('data-direction');
+            if (direction) {
+                stopMove(direction);
+            }
+        });
+    });
+
+    const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) {
+        const interactButton = document.createElement('button');
+        interactButton.textContent = 'Interagisci';
+        interactButton.className = 'interact-button';
+
+        interactButton.addEventListener('mousedown', function() {
+            buttonPressed.interact = true;
+        });
+
+        interactButton.addEventListener('mouseup', function() {
+            buttonPressed.interact = false;
+        });
+
+        interactButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            buttonPressed.interact = true;
+        });
+
+        interactButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            buttonPressed.interact = false;
+        });
+
+        controlsDiv.appendChild(interactButton);
+    }
+
+>>>>>>> a9a83d16a773600268dce6541d8417144f1089da
     window.debugRoom = function() {
         renderGame();
     };
