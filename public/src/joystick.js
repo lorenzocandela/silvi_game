@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const xButton = document.createElement('button');
     xButton.className = 'x-button';
-    xButton.textContent = 'X';
+    xButton.textContent = 'A';
     xButtonContainer.appendChild(xButton);
 
     // Joystick variables

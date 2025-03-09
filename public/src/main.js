@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Question box styles */
         #questionBox {
             position: absolute;
-            top: 50%;
+            top: 250px;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 80%;
@@ -170,13 +170,14 @@ document.addEventListener('DOMContentLoaded', function() {
         #answerOptions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
         }
         
         .answer-button {
             background-color: #004400;
             color: #00ff00;
             border: 2px solid #00aa00;
+            width: 100%;
             border-radius: 4px;
             padding: 10px;
             font-size: 16px;
