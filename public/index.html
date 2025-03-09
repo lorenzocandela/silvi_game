@@ -2,12 +2,93 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>SILVI - Pixel Game</title>
+    
+    <!-- meta x pwa-->
+    <meta name="description" content="Un'avventura a pixel art con puzzle ed esplorazione">
+    <meta name="theme-color" content="#00aa00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SILVI">
+    
+    <!-- Icone *da aggiustare -->
+    <link rel="apple-touch-icon" href="/assets/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/assets/logo.png">
+    
+    <!-- Favicon *da aggiustare-->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.png">
+    <link rel="shortcut icon" href="/assets/logo.png">
+    
+    <!-- manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/joinare.css">
+    <link rel="stylesheet" href="/joystick.css">
+    
+    <!-- config base pwa -->
+    <style>
+        html, body {
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        .splash-screen img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+        
+        .splash-screen h1 {
+            color: #00ff00;
+            font-family: 'retropix-bold', sans-serif;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .splash-screen .loading-bar {
+            width: 200px;
+            height: 10px;
+            background-color: #004400;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .splash-screen .loading-progress {
+            width: 0%;
+            height: 100%;
+            background-color: #00ff00;
+            transition: width 0.5s ease-out;
+        }
+    </style>
 </head>
 <body>
+    <div id="splashScreen" class="splash-screen">
+        <img src="/assets/logo.png" alt="Logo">
+        <h1>SILVI</h1>
+        <div class="loading-bar">
+            <div id="loadingProgress" class="loading-progress"></div>
+        </div>
+    </div>
+    
     <canvas id="gameCanvas" width="300" height="300"></canvas>
     <div id="roomNameContainer" class="room-name">
         <h2 id="roomName"></h2>
@@ -18,8 +99,39 @@
     <div id="puzzleStatus" class="puzzle-unsolved">Find and solve the chest puzzle to unlock doors</div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/src/pwa.js"></script>
     <script src="/src/joinare.js"></script>
     <script src="/src/main.js"></script>
     <script src="/src/joystick.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const splashScreen = document.getElementById('splashScreen');
+            const loadingProgress = document.getElementById('loadingProgress');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                loadingProgress.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        splashScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            splashScreen.style.display = 'none';
+                        }, 500);
+                    }, 500);
+                }
+            }, 100);
+            
+            document.addEventListener('click', function speedUp() {
+                progress = Math.min(progress + 20, 95);
+                loadingProgress.style.width = progress + '%';
+                document.removeEventListener('click', speedUp);
+            });
+        });
+    </script>
 </body>
 </html>

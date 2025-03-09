@@ -1,4 +1,3 @@
-//JOINARE.js
 let isMultiplayer = false;
 let isHost = false;
 let gameCode = '';
@@ -13,12 +12,9 @@ window.drawOtherPlayer = function() {
         return;
     }
 
-    // Only draw other player if they're in the same room as the current player
     if (otherPlayerData.roomId !== window.roomSystem.currentRoom) {
         return;
     }
-
-    //console.log("Drawing other player at:", otherPlayerData.x, otherPlayerData.y);
 
     if (window.player2Sprite && window.player2Sprite.complete) {
         try {
@@ -92,21 +88,21 @@ function showMultiplayerVictory() {
             z-index: 1000;
             border-bottom: 3px solid gold;
         }
-        
+
         .banner-content {
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
         .banner-content h2 {
             color: gold;
             margin: 5px 0;
         }
-        
+
         .banner-buttons {
             margin: 10px 0;
         }
-        
+
         .banner-buttons button {
             margin: 0 10px;
             padding: 5px 15px;
@@ -116,7 +112,7 @@ function showMultiplayerVictory() {
             border-radius: 4px;
             cursor: pointer;
         }
-        
+
         .banner-buttons button:hover {
             background-color: #45a049;
         }
@@ -134,7 +130,7 @@ function showMultiplayerVictory() {
             });
         }
     });
-    
+
     document.getElementById('stayButton').addEventListener('click', () => {
         document.body.removeChild(victoryBanner);
     });
@@ -146,13 +142,12 @@ function updateGlobalMultiplayerState() {
 }
 
 function initMultiplayer() {
-    //console.log("Initializing multiplayer system");
 
     try {
         socket = io();
 
         socket.on('connect', () => {
-            //console.log('Connected to server with ID:', socket.id);
+
         });
 
         socket.on('gameCreated', (data) => {
@@ -161,7 +156,7 @@ function initMultiplayer() {
             isMultiplayer = true;
             updateGlobalMultiplayerState();
             showGameCode(gameCode);
-            //console.log('Game created with code:', gameCode);
+
         });
 
         socket.on('joinSuccess', (data) => {
@@ -171,24 +166,24 @@ function initMultiplayer() {
             updateGlobalMultiplayerState();
             hideJoinUI();
             showConnectedMessage(data.hostId);
-            //console.log('Successfully joined game with code:', gameCode);
+
         });
 
         socket.on('playerJoined', (data) => {
             connectedPlayers.push(data.playerId);
             showPlayerJoinedMessage(data.playerId);
-            //console.log('Player joined:', data.playerId);
+
         });
 
         socket.on('gameStarted', () => {
-            //console.log('Game started by the host, initializing game client');
+
             hideMenuAndStartGame();
         });
 
         socket.on('updateGameState', (data) => {
             otherPlayerData = data;
             updateGlobalMultiplayerState();
-            //console.log('Received game state update:', data,'Our current room:', window.roomSystem ? window.roomSystem.currentRoom : "unknown");
+
             checkVictoryCondition();
         });
 
@@ -196,7 +191,6 @@ function initMultiplayer() {
             const {
                 newRoomId
             } = data;
-            //console.log(`Other player moved to room: ${newRoomId}`);
 
             if (parseInt(newRoomId) === 24 && window.roomSystem.currentRoom === 24) {
                 showMultiplayerVictory();
@@ -254,10 +248,8 @@ function sendGameStateUpdate() {
 }
 
 function setupGameExtensions() {
-    //console.log("Setting up game extensions");
 
     if (typeof window.renderGame === 'function') {
-        //console.log("Found renderGame function, extending it for multiplayer");
 
         const originalRenderGame = window.renderGame;
 
@@ -266,12 +258,11 @@ function setupGameExtensions() {
             originalRenderGame();
 
             if (isMultiplayer) {
-                //console.log("Calling drawOtherPlayer from extended renderGame");
+
                 window.drawOtherPlayer();
             }
         };
 
-        //console.log("Successfully extended renderGame");
     } else {
         console.error("Could not find renderGame function to extend - window.renderGame:", window.renderGame);
     }
@@ -280,8 +271,6 @@ function setupGameExtensions() {
 function markRoomDiscovered(roomId) {
     discoveredRooms.add(parseInt(roomId));
 
-    //console.log(`Room ${roomId} discovered. Total: ${discoveredRooms.size}/24 rooms`);
-
     const progressElement = document.getElementById('explorationProgress');
     if (progressElement) {
         progressElement.textContent = `Exploration: ${discoveredRooms.size}/24 rooms`;
@@ -289,7 +278,6 @@ function markRoomDiscovered(roomId) {
 }
 
 function createMainMenuUI() {
-    //console.log("Creating multiplayer menu UI");
 
     const menuContainer = document.createElement('div');
     menuContainer.id = 'menuContainer';
@@ -405,15 +393,15 @@ function showPlayerJoinedMessage(playerId) {
 }
 
 function startSinglePlayerGame() {
-    //console.log("Starting single player game");
+
     isMultiplayer = false;
     hideMenuAndStartGame();
 }
 
 function startMultiplayerGame() {
-    //console.log("Starting multiplayer game as host");
+
     if (!isHost) return;
-    //console.log("Emitting startGame event with code:", gameCode);
+
     socket.emit('startGame', {
         gameCode
     });
@@ -443,14 +431,11 @@ function hideMenuAndStartGame() {
 
     if (!gameInit) {
 
-        //console.log("Initializing game from multiplayer menu");
-
         updateGlobalMultiplayerState();
 
         if (typeof window.initGame === 'function') {
             window.initGame();
 
-            //console.log("Setting up multiplayer extensions immediately");
             setupGameExtensions();
 
             gameInit = true;
@@ -478,16 +463,7 @@ function updateFrameCount() {
 }
 
 function logMultiplayerState() {
-    //console.log("----- MULTIPLAYER STATE DEBUG -----");
-    //console.log("isMultiplayer:", isMultiplayer);
-    //console.log("isHost:", isHost);
-    //console.log("gameCode:", gameCode);
-    //console.log("otherPlayerData:", otherPlayerData);
-    //console.log("Our player position:", window.player ? `x: ${window.player.x}, y: ${window.player.y}` : "N/A");
-    //console.log("Our room:", window.roomSystem ? window.roomSystem.currentRoom : "N/A");
-    //console.log("window.isMultiplayer set?", window.isMultiplayer ? "Yes" : "No");
-    //console.log("window.drawOtherPlayer exists?", typeof window.drawOtherPlayer === 'function' ? "Yes" : "No");
-    //console.log("-----------------------------------");
+
 }
 
 function startMultiplayerDebug() {
@@ -496,14 +472,13 @@ function startMultiplayerDebug() {
 }
 
 window.addEventListener('load', function() {
-    //console.log("Window loaded, delaying multiplayer initialization");
 
     updateFrameCount();
 
     setTimeout(startMultiplayerDebug, 3000);
 
     setTimeout(function() {
-        //console.log("Starting multiplayer initialization");
+
         initMultiplayer();
     }, 500);
 });

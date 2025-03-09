@@ -1,4 +1,3 @@
-//SERVER.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -27,7 +26,6 @@ function generateGameCode() {
 }
 
 io.on('connection', (socket) => {
-    //console.log('User connected:', socket.id);
 
     socket.on('createGame', () => {
         const gameCode = generateGameCode();
@@ -45,7 +43,6 @@ io.on('connection', (socket) => {
             gameCode
         });
 
-        //console.log(`Game created with code ${gameCode} by player ${socket.id}`);
     });
 
     socket.on('joinGame', (data) => {
@@ -87,7 +84,6 @@ io.on('connection', (socket) => {
             playerId: socket.id
         });
 
-        //console.log(`Player ${socket.id} joined game ${gameCode}`);
     });
 
     socket.on('startGame', (data) => {
@@ -103,7 +99,6 @@ io.on('connection', (socket) => {
 
         io.to(gameCode).emit('gameStarted');
 
-        //console.log(`Game ${gameCode} started by host ${socket.id}`);
     });
 
     socket.on('updateGameState', (data) => {
@@ -113,19 +108,16 @@ io.on('connection', (socket) => {
         } = data;
 
         if (!gameRooms[gameCode]) {
-            //console.log(`Invalid game code in updateGameState: ${gameCode}`);
+
             return;
         }
 
         gameRooms[gameCode].lastActivity = Date.now();
 
-        //console.log(`Forwarding state update from ${playerId} in game ${gameCode} to other players`);
-
         socket.to(gameCode).emit('updateGameState', data);
     });
 
     socket.on('disconnect', () => {
-        //console.log('User disconnected:', socket.id);
 
         for (const gameCode in gameRooms) {
             const room = gameRooms[gameCode];
@@ -141,11 +133,11 @@ io.on('connection', (socket) => {
                         reason: 'Host disconnected'
                     });
                     delete gameRooms[gameCode];
-                    //console.log(`Game ${gameCode} ended - host disconnected`);
+
                 } else {
 
                     room.players = room.players.filter(id => id !== socket.id);
-                    //console.log(`Player ${socket.id} removed from game ${gameCode}`);
+
                 }
             }
         }
@@ -171,13 +163,11 @@ io.on('connection', (socket) => {
             newRoomId
         } = data;
         if (!gameRooms[gameCode]) {
-            //console.log(`Invalid game code in roomTransition: ${gameCode}`);
+
             return;
         }
 
         gameRooms[gameCode].lastActivity = Date.now();
-
-        //console.log(`Player ${socket.id} moved to room ${newRoomId} in game ${gameCode}`);
 
         socket.to(gameCode).emit('roomTransition', {
             newRoomId,
@@ -207,7 +197,7 @@ io.on('connection', (socket) => {
             }
 
             if (allInFinalRoom && finalRoomPlayers.length > 1) {
-                //console.log(`All players in game ${gameCode} are in the final room! Victory!`);
+
                 io.to(gameCode).emit('multiplayerVictory');
             }
         } else {
@@ -226,21 +216,21 @@ setInterval(() => {
         const room = gameRooms[gameCode];
 
         if (room.lastActivity && now - room.lastActivity > 2 * 60 * 60 * 1000) {
-            //console.log(`Cleaning up stale game room: ${gameCode}`);
+
             delete gameRooms[gameCode];
         }
     }
 }, 15 * 60 * 1000);
 
 process.on('SIGTERM', () => {
-    //console.log('SIGTERM received, shutting down gracefully');
+
     server.close(() => {
-        //console.log('Server closed');
+
         process.exit(0);
     });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    //console.log(`Server running on port ${PORT}`);
+
 });

@@ -140,8 +140,6 @@ h3, p {
     from { opacity: 1; }
     to { opacity: 0; }
 }
-
-/* Player Indicators in multiplayer mode */
 .player-indicator {
     position: absolute;
     top: -20px;
@@ -154,8 +152,6 @@ h3, p {
     font-size: 12px;
     white-space: nowrap;
 }
-
-/* Modifications to existing game elements for multiplayer */
 .room-name.multiplayer:before {
     content: "👥";
     margin-right: 5px;

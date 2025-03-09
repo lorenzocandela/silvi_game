@@ -1,4 +1,3 @@
-//MAIN.js
 document.addEventListener('DOMContentLoaded', function() {
 
     const canvas = document.getElementById('gameCanvas');
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     chestImage.src = '/assets/chest.png';
     const floorImage = new Image();
     floorImage.src = '/assets/floor.png';
-    
+
     window.canvas = canvas;
     window.ctx = ctx;
     window.playerSprite = playerSprite;
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.chestImage = chestImage;
     window.floorImage = floorImage;
 
-    // Set up game container for visual effects
     const gameContainer = document.getElementById('gameCanvas').parentElement;
     gameContainer.style.position = 'relative';
     gameContainer.style.overflow = 'hidden';
@@ -31,13 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.backgroundColor = '#111';
     gameContainer.style.padding = '15px';
 
-    // Create offscreen canvas
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
     const offscreenCtx = offscreenCanvas.getContext('2d');
 
-    // Create darkness overlay canvas
     const darknessCanvas = document.createElement('canvas');
     darknessCanvas.id = 'darknessOverlay';
     darknessCanvas.width = canvas.width;
@@ -45,27 +41,25 @@ document.addEventListener('DOMContentLoaded', function() {
     darknessCanvas.style.position = 'absolute';
     darknessCanvas.style.marginTop = '35px';
     gameContainer.appendChild(darknessCanvas);
-    
-    // Get the context for the darkness canvas
+
     const darknessCtx = darknessCanvas.getContext('2d');
 
-    // Add CRT style
     const crtStyle = document.createElement('style');
     crtStyle.textContent = `
         #gameCanvas {
             position: relative;
-            transform: scale(0.98); /* Slight scale for curved effect */
+            transform: scale(0.98); 
             filter: 
                 brightness(1.1)
                 contrast(1.2)
                 sepia(0.2)
-                hue-rotate(40deg) /* Gives that green phosphor look */
+                hue-rotate(40deg) 
                 saturate(1.5);
             box-shadow: 
                 inset 0 0 10px rgba(0, 255, 0, 0.3),
                 0 0 7px rgba(0, 255, 0, 0.7);
         }
-    
+
         #crtOverlay {
             position: absolute;
             top: 0;
@@ -81,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pointer-events: none;
             opacity: 0.3;
         }
-        
+
         #crtGlow {
             position: absolute;
             top: 0;
@@ -95,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 1001;
             pointer-events: none;
         }
-        
+
         #crtVignette {
             position: absolute;
             top: 0;
@@ -110,8 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 999;
             pointer-events: none;
         }
-    
-        /* TV frame */
+
         #tvFrame {
             position: absolute;
             top: -20px;
@@ -122,8 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: -1;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
-        
-        /* Green pixels effect */
+
         #pixelOverlay {
             position: absolute;
             top: 0;
@@ -136,8 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 998;
             pointer-events: none;
         }
-        
-        /* Question box styles */
+
         #questionBox {
             position: absolute;
             top: 250px;
@@ -155,24 +146,24 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 2000;
             text-align: center;
         }
-        
+
         #questionBox h2 {
             font-size: 24px;
             margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
         }
-        
+
         #questionBox p {
             font-size: 18px;
             margin-bottom: 30px;
         }
-        
+
         #answerOptions {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        
+
         .answer-button {
             background-color: #004400;
             color: #00ff00;
@@ -186,17 +177,17 @@ document.addEventListener('DOMContentLoaded', function() {
             text-align: left;
             font-family: 'Courier New', monospace;
         }
-        
+
         .answer-button:hover {
             background-color: #006600;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
-        
+
         .answer-button.correct {
             background-color: #008800;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
         }
-        
+
         .answer-button.incorrect {
             background-color: #880000;
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
@@ -205,22 +196,20 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(crtStyle);
 
-    // Light properties
     const lightSettings = {
-        radius: 80,         // Size of the light circle
-        softness: 30,       // Edge softness
-        intensity: 0.9,     // Light intensity (1 = full bright, 0 = no light)
-        flicker: true,      // Whether the light flickers
-        flickerRange: 0.1,  // How much the light flickers
-        color: 'rgba(0, 255, 0, 0.4)' // Light color with green tint
+        radius: 80,         
+        softness: 30,       
+        intensity: 0.9,     
+        flicker: true,      
+        flickerRange: 0.1,  
+        color: 'rgba(0, 255, 0, 0.4)' 
     };
 
-    // Question system - configure questions and answers for each room
     const questions = {
         1: {
             question: "Welcome to the adventure! What's your favorite color?",
             answers: ["Green", "Blue", "Red", "Yellow"],
-            correctIndex: 0, // Green is always correct for the first room
+            correctIndex: 0, 
             explanation: "Green is the color of adventure! Welcome to your journey."
         },
         2: {
@@ -363,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    //TODO: Aggiungere mappe nuove, magari non tutte capire bene
     const floorImages = {
         1: '/assets/floor1.png',
         2: '/assets/floor2.png',
@@ -526,14 +516,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadFloorImages() {
         floorImage.onload = () => {
-            //console.log("Immagine del pavimento di default caricata");
+
         };
 
         for (const roomId in floorImages) {
             const img = new Image();
             img.src = floorImages[roomId];
             img.onload = () => {
-                //console.log(`Immagine del pavimento per la stanza ${roomId} caricata`);
+
                 floorImagesLoaded[roomId] = img;
             };
         }
@@ -541,8 +531,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function initializeChests() {
         for (let roomId = 1; roomId <= 24; roomId++) {
-            const roomQuestion = questions[roomId] || questions[1]; // Fallback to room 1 if no question defined
-            
+            const roomQuestion = questions[roomId] || questions[1]; 
+
             chests[roomId] = {
                 x: canvas.width / 2 - Math.random() * 50,
                 y: canvas.height / 2 - Math.random() * 50,
@@ -557,7 +547,6 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
 
-        // Make the first chest pre-solved for easier start
         chests[1].solved = true;
     }
 
@@ -565,14 +554,14 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const roomId in roomSystem.connections) {
             roomSystem.doorPositions[roomId] = {};
             roomSystem.doorColors[roomId] = {};
-    
+
             const connectedRooms = roomSystem.connections[roomId];
             const positions = ["left", "right", "top", "bottom"];            
             for (let i = positions.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [positions[i], positions[j]] = [positions[j], positions[i]];
             }
-    
+
             connectedRooms.forEach((targetRoom, index) => {
                 const position = positions[index % positions.length];
                 if (!roomSystem.doorPositions[roomId][targetRoom]) {
@@ -585,33 +574,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function addDeadEndsAndModifyConnections() {
-        // Create a copy of the original connections to use as reference
+
         const originalConnections = JSON.parse(JSON.stringify(roomSystem.connections));
-        
-        // Add some dead-end rooms (rooms that lead nowhere)
+
         const deadEndRooms = [9, 10, 12, 16, 19, 21];
-        // Remove some two-way connections and make them one-way
+
         const oneWayConnections = [
-            {from: 2, to: 7},  // Can go from 2 to 7, but not back
-            {from: 3, to: 8},  // Can go from 3 to 8, but not back
-            {from: 5, to: 10}, // Can go from 5 to 10, but not back
-            {from: 11, to: 16} // Can go from 11 to 16, but not back
+            {from: 2, to: 7},  
+            {from: 3, to: 8},  
+            {from: 5, to: 10}, 
+            {from: 11, to: 16} 
         ];
-        
+
         oneWayConnections.forEach(conn => {
             const backConnections = roomSystem.connections[conn.to];
             if (backConnections) {
                 roomSystem.connections[conn.to] = backConnections.filter(room => room !== conn.from);
             }
         });
-        
+
         const additionalConnections = [
-            {from: 1, to: 8},   // Connect entrance to a later room
-            {from: 4, to: 10},  // Connect dead-end to another room
-            {from: 14, to: 17}, // Create a shortcut
-            {from: 9, to: 12}   // Create an additional path
+            {from: 1, to: 8},   
+            {from: 4, to: 10},  
+            {from: 14, to: 17}, 
+            {from: 9, to: 12}   
         ];
-        
+
         additionalConnections.forEach(conn => {
             if (!roomSystem.connections[conn.from].includes(conn.to)) {
                 roomSystem.connections[conn.from].push(conn.to);
@@ -620,7 +608,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 roomSystem.connections[conn.to].push(conn.from);
             }
         });
-        
+
         const pathToFinal = [
             {from: 22, to: 24},
             {from: 23, to: 24},
@@ -629,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {from: 20, to: 23},
             {from: 21, to: 23}
         ];
-        
+
         pathToFinal.forEach(conn => {
             if (!roomSystem.connections[conn.from].includes(conn.to)) {
                 roomSystem.connections[conn.from].push(conn.to);
@@ -754,23 +742,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (doorImage.complete && lockedDoorImage.complete) {
                 if (doorLocked) {
-                    // Draw locked door using the locked door image
+
                     ctx.drawImage(lockedDoorImage, x, y, width, height);
                 } else {
-                    // Draw unlocked door
+
                     ctx.drawImage(doorImage, x, y, width, height);
                 }
             } else {
-                // Fallback if door images aren't loaded
-                ctx.fillStyle = doorLocked ? "#FF0000" : "#8B4513"; // Wood color for unlocked doors
+
+                ctx.fillStyle = doorLocked ? "#FF0000" : "#8B4513"; 
                 ctx.fillRect(x, y, width, height);
 
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 4;
                 ctx.strokeRect(x, y, width, height);
 
-                // Draw door panel
-                ctx.fillStyle = doorLocked ? "#FF6666" : "#A0522D"; // Darker wood color
+                ctx.fillStyle = doorLocked ? "#FF6666" : "#A0522D"; 
                 const panelPadding = 10;
                 ctx.fillRect(x + panelPadding, y + panelPadding,
                     width - panelPadding * 2, height - panelPadding * 2);
@@ -823,77 +810,65 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Function to draw the darkness when a question is active
     function drawQuestionDarkness() {
         if (!questionBoxVisible) return;
-        
-        // Create complete darkness
+
         darknessCtx.clearRect(0, 0, darknessCanvas.width, darknessCanvas.height);
         darknessCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
         darknessCtx.fillRect(0, 0, darknessCanvas.width, darknessCanvas.height);
     }
 
-    // Function to draw the darkness with a light around the player
     function drawDarkness() {
         if (!window.player || questionBoxVisible) return;
-        
-        // Get player center position
+
         const playerCenterX = window.player.x + window.player.width / 2;
         const playerCenterY = window.player.y + window.player.height / 2;
-        
-        // Calculate light radius with optional flicker
+
         let lightRadius = lightSettings.radius;
         if (lightSettings.flicker) {
             const flicker = Math.random() * lightSettings.flickerRange * 2 - lightSettings.flickerRange;
             lightRadius += flicker * lightRadius;
         }
-        
-        // Clear the previous frame
+
         darknessCtx.clearRect(0, 0, darknessCanvas.width, darknessCanvas.height);
-        
-        // Create a dark overlay with a hole for the light
+
         darknessCtx.save();
-        
-        // Create darkness
+
         darknessCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         darknessCtx.fillRect(0, 0, darknessCanvas.width, darknessCanvas.height);
-        
-        // Create light circle
+
         darknessCtx.globalCompositeOperation = 'destination-out';
-        
-        // Create gradient for soft edges
+
         const gradient = darknessCtx.createRadialGradient(
             playerCenterX, playerCenterY, 0,
             playerCenterX, playerCenterY, lightRadius + lightSettings.softness
         );
-        
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); // Full transparency at center
+
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); 
         gradient.addColorStop(lightSettings.intensity, 'rgba(0, 0, 0, 0.9)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Full darkness at edge
-        
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); 
+
         darknessCtx.fillStyle = gradient;
         darknessCtx.beginPath();
         darknessCtx.arc(playerCenterX, playerCenterY, lightRadius + lightSettings.softness, 0, Math.PI * 2);
         darknessCtx.fill();
-        
-        // Add a subtle colored glow for the light
+
         darknessCtx.globalCompositeOperation = 'source-over';
         const glowGradient = darknessCtx.createRadialGradient(
             playerCenterX, playerCenterY, 0,
             playerCenterX, playerCenterY, lightRadius
         );
-        
+
         glowGradient.addColorStop(0, lightSettings.color);
         glowGradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
-        
+
         darknessCtx.fillStyle = glowGradient;
         darknessCtx.beginPath();
         darknessCtx.arc(playerCenterX, playerCenterY, lightRadius, 0, Math.PI * 2);
         darknessCtx.fill();
-        
+
         darknessCtx.restore();
-        
-        // Optional: Add some light particles for atmosphere
+
         if (Math.random() > 0.8) {
             const particleCount = Math.floor(Math.random() * 3) + 1;
             for (let i = 0; i < particleCount; i++) {
@@ -902,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const particleX = playerCenterX + Math.cos(angle) * distance;
                 const particleY = playerCenterY + Math.sin(angle) * distance;
                 const size = Math.random() * 2 + 1;
-                
+
                 darknessCtx.fillStyle = 'rgba(100, 255, 100, 0.5)';
                 darknessCtx.beginPath();
                 darknessCtx.arc(particleX, particleY, size, 0, Math.PI * 2);
@@ -911,7 +886,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Random flicker effect
     function randomFlicker() {
         if (Math.random() > 0.97) {
             canvas.style.opacity = '0.87';
@@ -922,11 +896,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas.style.filter = 'brightness(1.1) contrast(1.2) sepia(0.2) hue-rotate(40deg) saturate(1.5)';
             }, 50 + Math.random() * 50);
         }
-        
+
         requestAnimationFrame(randomFlicker);
     }
-    
-    // Add random noise occasionally
+
     function addRandomNoise() {
         if (Math.random() > 0.98) {
             ctx.save();
@@ -941,32 +914,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             ctx.restore();
         }
-        
+
         setTimeout(addRandomNoise, 200);
     }
 
-    // Change the colors of everything to green-ish
     function convertToGreenPhosphor() {
-        // Update player sprite colors
+
         if (window.player && window.player.color) {
             window.player.color = '#00ff00';
         }
-        
-        // Update chest colors
+
         for (const roomId in chests) {
             if (chests[roomId].color) {
                 chests[roomId].color = '#00aa00';
             }
         }
-        
-        // Update text colors
+
         const textElements = document.querySelectorAll('.puzzle-solved, .puzzle-unsolved, #roomName, #timer');
         textElements.forEach(el => {
             el.style.color = '#00ff00';
             el.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7)';
         });
-        
-        // Update game UI
+
         document.body.style.backgroundColor = '#111';
         const controlsDiv = document.querySelector('.controls');
         if (controlsDiv) {
@@ -1087,17 +1056,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     window.renderGame = function() {
-        // Save the current context state
+
         ctx.save();
-        
-        // Clear the canvas with a dark background
+
         ctx.fillStyle = '#001100';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Call the original render function
+
         renderGame();
-        
-        // Restore the context state
+
         ctx.restore();
     };
 
@@ -1209,62 +1175,53 @@ document.addEventListener('DOMContentLoaded', function() {
         return distanceX < 40 && distanceY < 40;
     }
 
-    // Function to show the question box
     function showQuestionBox() {
         if (questionBoxVisible) return;
-        
+
         const currentChest = chests[roomSystem.currentRoom];
         if (!currentChest) return;
-        
+
         questionBoxVisible = true;
-        
-        // Create question box
+
         const questionBox = document.createElement('div');
         questionBox.id = 'questionBox';
-        
-        // Room name and question
+
         questionBox.innerHTML = `
             <h2>${roomSystem.roomNames[roomSystem.currentRoom]}</h2>
             <p>${currentChest.question}</p>
             <div id="answerOptions"></div>
         `;
-        
+
         document.body.appendChild(questionBox);
-        
-        // Add answer options
+
         const answerOptions = document.getElementById('answerOptions');
-        
+
         currentChest.answers.forEach((answer, index) => {
             const button = document.createElement('button');
             button.className = 'answer-button';
             button.textContent = answer;
             button.dataset.index = index;
-            
+
             button.addEventListener('click', function() {
                 handleAnswerClick(parseInt(this.dataset.index));
             });
-            
+
             answerOptions.appendChild(button);
         });
-        
-        // Make sure the canvas still has focus for keyboard events
+
         canvas.focus();
-        
-        // Update darkness for question mode
+
         drawQuestionDarkness();
     }
 
-    // Function to handle answer clicks
     function handleAnswerClick(answerIndex) {
         const currentChest = chests[roomSystem.currentRoom];
         const answerButtons = document.querySelectorAll('.answer-button');
-        
-        // Disable all buttons to prevent multiple clicks
+
         answerButtons.forEach(button => {
             button.disabled = true;
         });
-        
-        // Highlight the correct and incorrect answers
+
         answerButtons.forEach((button, index) => {
             if (index === currentChest.correctIndex) {
                 button.classList.add('correct');
@@ -1272,33 +1229,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.classList.add('incorrect');
             }
         });
-        
+
         if (answerIndex === currentChest.correctIndex) {
-            // Correct answer
+
             setTimeout(() => {
-                // Add explanation to the question box
+
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
                     <p style="color: #00ff00; margin-top: 20px;">${currentChest.explanation}</p>
                     <button id="continueButton" class="answer-button" style="margin-top: 20px;">Continue</button>
                 `;
-                
+
                 document.getElementById('continueButton').addEventListener('click', function() {
                     closeQuestionBox(true);
                 });
             }, 1000);
         } else {
-            // Incorrect answer
+
             setTimeout(() => {
-                // Add try again button
+
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
                     <p style="color: #ff6666; margin-top: 20px;">Incorrect. Try again!</p>
                     <button id="tryAgainButton" class="answer-button" style="margin-top: 20px;">Try Again</button>
                 `;
-                
+
                 document.getElementById('tryAgainButton').addEventListener('click', function() {
-                    // Recreate the question box
+
                     document.body.removeChild(questionBox);
                     questionBoxVisible = false;
                     showQuestionBox();
@@ -1307,28 +1264,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to close the question box
     function closeQuestionBox(solved) {
         const questionBox = document.getElementById('questionBox');
         if (questionBox) {
             document.body.removeChild(questionBox);
         }
-        
+
         questionBoxVisible = false;
-        
+
         if (solved) {
-            // Mark the chest as solved
+
             const currentChest = chests[roomSystem.currentRoom];
             currentChest.opened = true;
             currentChest.solved = true;
-            
-            // Show success message
+
             updatePuzzleStatus();
-            
-            // Increase light radius temporarily to celebrate
+
             const originalRadius = lightSettings.radius;
             lightSettings.radius = originalRadius * 2;
-            
+
             setTimeout(() => {
                 lightSettings.radius = originalRadius;
             }, 1500);
@@ -1338,16 +1292,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleInteraction() {
         if (isRoomTransitioning || isPopupOpen || questionBoxVisible) return;
         if (interactionCooldown > 0) return;
-        
+
         interactionCooldown = 500; 
-        
+
         if (isPlayerNearChest()) {
             const currentChest = chests[roomSystem.currentRoom];
-            
+
             if (currentChest.solved) {
-                // If already solved, do nothing
+
             } else {
-                // Show question
+
                 showQuestionBox();
             }
         }
@@ -1414,7 +1368,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isMoving = updateMovement();
         updateAnimation(deltaTime, isMoving);
         updateTransition(deltaTime);
-        
+
         if (questionBoxVisible) {
             drawQuestionDarkness();
         } else {
@@ -1485,13 +1439,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 chests[roomId].solved = false;
             }
         }
-        // Make room 1 always solved
+
         chests[1].solved = true;
-        
+
         initTimer();
         updatePuzzleStatus();
-        
-        // Close any open question box
+
         if (questionBoxVisible) {
             closeQuestionBox(false);
         }
@@ -1523,26 +1476,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.stopMove = stopMove;
 
-    // Function to update questions and answers (for code modification)
     window.updateQuestionData = function(roomId, questionData) {
         if (!roomId || !questionData) return false;
-        
-        // Update the questions object
+
         questions[roomId] = {
             question: questionData.question || "Default question?",
             answers: questionData.answers || ["Yes", "No", "Maybe", "I don't know"],
             correctIndex: questionData.correctIndex || 0,
             explanation: questionData.explanation || "That's correct!"
         };
-        
-        // Update chest if already initialized
+
         if (chests[roomId]) {
             chests[roomId].question = questions[roomId].question;
             chests[roomId].answers = questions[roomId].answers;
             chests[roomId].correctIndex = questions[roomId].correctIndex;
             chests[roomId].explanation = questions[roomId].explanation;
         }
-        
+
         return true;
     };
 
@@ -1558,16 +1508,13 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.addEventListener('click', handlePopupClick);
         initTimer();
         updatePuzzleStatus();
-        
-        // Start visual effects
+
         randomFlicker();
         addRandomNoise();
         setTimeout(convertToGreenPhosphor, 100);
-        
-        // Render initial game state
+
         window.renderGame();
 
-        // Start game loop
         lastTime = 0;
         requestAnimationFrame(gameLoop);
     }
