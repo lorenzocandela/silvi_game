@@ -54,9 +54,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const xButton = document.createElement('button');
     xButton.className = 'x-button';
     const xButtonSpan = document.createElement('span');
-    xButtonSpan.textContent = 'A';
-    xButtonSpan.style.marginLeft = '4px';
-    xButtonSpan.style.fontSize = '45px';
+    const xButtonImg = document.createElement('img');
+    xButtonImg.src = '/assets/interagisci.png';
+    xButtonImg.style.marginTop = '3px';
+    xButtonImg.style.marginRight = '2px';
+    xButtonImg.style.width = '34px';
+    xButtonSpan.appendChild(xButtonImg);
     xButton.appendChild(xButtonSpan);
     xButtonContainer.appendChild(xButton);
 

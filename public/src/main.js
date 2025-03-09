@@ -3,10 +3,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    const doorFrames = [];
+    const DOOR_FRAME_COUNT = 8;
+    let doorFramesLoaded = 0;
+
+    for (let i = 1; i < DOOR_FRAME_COUNT; i++) {
+        const frameImg = new Image();
+        frameImg.onload = () => {
+            doorFramesLoaded++;
+        };
+        frameImg.onerror = () => {
+            console.error(`Caso di errore door ${i}, path: ${frameImg.src}`);
+            frameImg.isErrored = true;
+        };
+        frameImg.src = `/assets/doors-gif/door${i}.png`;
+        doorFrames.push(frameImg);
+    }
+
+    let doorAnimFrame = 0;
+    let doorAnimTimer = 0;
+    const DOOR_ANIM_SPEED = 50; // vel frame
+
     const playerSprite = new Image();
     playerSprite.src = '/assets/player_sprites.png';
     const doorImage = new Image();
-    doorImage.src = '/assets/door.png';
+    doorImage.src = '/assets/door.gif';
     const lockedDoorImage = new Image();
     lockedDoorImage.src = '/assets/door-locked.png';
     const chestImage = new Image();
@@ -194,21 +215,21 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(crtStyle);
 
     const lightSettings = {
-        radius: 80,         
-        softness: 30,       
-        intensity: 0.9,     
-        flicker: true,      
-        flickerRange: 0.1,  
-        color: 'rgba(0, 255, 0, 0.4)' 
+        radius: 80,
+        softness: 30,
+        intensity: 0.9,
+        flicker: true,
+        flickerRange: 0.1,
+        color: 'rgba(0, 255, 0, 0.4)'
     };
 
     //TODO: Domande e risposte Enigmi/Canzoni
     const questions = {
         1: {
-            question: "Welcome to the adventure! What's your favorite color?",
-            answers: ["Green", "Blue", "Red", "Yellow"],
-            correctIndex: 0, 
-            explanation: "Green is the color of adventure! Welcome to your journey."
+            question: "BENVUT* NEL LABIRINTO SILVI! DUE SEMPLICI REGOLE: 1. RISPONDI CORRETTAMENTE ALLE DOMANDE E SBLOCCHI I PORTALI 2. SE SBAGLI TOGLI UNA VITA AL/ALLA TU* COMPAGN*. SEI PRONT*?",
+            answers: ["SI", "NO"],
+            correctIndex: 0,
+            explanation: ""
         },
         2: {
             question: "What is the capital of France?",
@@ -247,10 +268,10 @@ document.addEventListener('DOMContentLoaded', function() {
             explanation: "Oxygen has the chemical symbol 'O'."
         },
         8: {
-            question: "How many sides does a hexagon have?",
-            answers: ["5", "6", "7", "8"],
-            correctIndex: 1,
-            explanation: "A hexagon has 6 sides."
+            question: "Come chiamiamo il barista dell'Alambicco?",
+            answers: ["Gaspa", "Luca", "Povia", "Albi"],
+            correctIndex: 2,
+            explanation: ""
         },
         9: {
             question: "What is the closest star to Earth?",
@@ -283,10 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
             explanation: "Tokyo is the capital of Japan."
         },
         14: {
-            question: "Which instrument has 88 keys?",
-            answers: ["Guitar", "Violin", "Drums", "Piano"],
-            correctIndex: 3,
-            explanation: "A standard piano has 88 keys."
+            question: "La prima volta che siamo andati al Castello di Moncalieri da soli, che anno era?",
+            answers: ["2019", "2020", "2021", "2022"],
+            correctIndex: 1,
+            explanation: "E li mi hai skifato :/"
         },
         15: {
             question: "What is the hardest natural substance on Earth?",
@@ -352,20 +373,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //TODO: Aggiungere mappe nuove, magari non tutte capire bene
     const floorImages = {
-        1: '/assets/floor1.png',
-        2: '/assets/floor2.png',
+        1: '/assets/floors/test.png',
+        //1: '/assets/floors/floor1.png',
+        2: '/assets/floors/floor2.png',
         3: '/assets/floor3.png',
         4: '/assets/floor1.png',
         5: '/assets/floor2.png',
-        6: '/assets/floor3.png',
+        6: '/assets/floors/floor6.png',
         7: '/assets/floor1.png',
-        8: '/assets/floor2.png',
+        8: '/assets/floors/floor8.png',
         9: '/assets/floor3.png',
         10: '/assets/floor1.png',
         11: '/assets/floor2.png',
         12: '/assets/floor3.png',
         13: '/assets/floor1.png',
-        14: '/assets/floor2.png',
+        14: '/assets/floors/floor14.png',
         15: '/assets/floor3.png',
         16: '/assets/floor1.png',
         17: '/assets/floor2.png',
@@ -374,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
         20: '/assets/floor2.png',
         21: '/assets/floor3.png',
         22: '/assets/floor1.png',
-        23: '/assets/floor2.png',
+        23: '/assets/floors/floor23.png',
         24: '/assets/floor3.png',
     };
 
@@ -400,54 +422,54 @@ document.addEventListener('DOMContentLoaded', function() {
     //TODO: Controlla i vicoli cechi, ci sono stanze sbagliate
     const roomSystem = {
         connections: {
-            1: [2, 5, 6], 
-            2: [1, 3, 7], 
-            3: [2, 4, 8], 
-            4: [3], 
+            1: [2, 5, 6],
+            2: [1, 3, 7],
+            3: [2, 4, 8],
+            4: [3],
 
-            5: [1, 9, 10], 
-            6: [1, 11], 
-            7: [2, 12, 13], 
-            8: [3, 14], 
+            5: [1, 9, 10],
+            6: [1, 11],
+            7: [2, 12, 13],
+            8: [3, 14],
 
-            9: [5, 15], 
-            10: [5], 
-            11: [6, 16, 17], 
-            12: [7], 
+            9: [5, 15],
+            10: [5],
+            11: [6, 16, 17],
+            12: [7],
 
-            13: [7, 18], 
-            14: [8, 19], 
-            15: [9, 20], 
-            16: [11], 
-            17: [11, 21], 
-            18: [13, 22], 
-            19: [14, 22], 
-            20: [15, 23], 
-            21: [17, 23], 
+            13: [7, 18],
+            14: [8, 19],
+            15: [9, 20],
+            16: [11],
+            17: [11, 21],
+            18: [13, 22],
+            19: [14, 22],
+            20: [15, 23],
+            21: [17, 23],
 
-            22: [18, 19, 24], 
-            23: [20, 21, 24], 
+            22: [18, 19, 24],
+            23: [20, 21, 24],
 
-            24: [22, 23] 
+            24: [22, 23]
         },
         currentRoom: 1,
         roomNames: {
             1: "Negozio",
             2: "La Piadineria",
             3: "UGC Cinema",
-            4: "Lago di Viverone", 
+            4: "Lago di Viverone",
             5: "Bar Noce",
             6: "Mondo Juve",
             7: "Follonica",
             8: "Alambicco",
             9: "Camping Thaiti",
-            10: "Lago di Avigliana", 
+            10: "Lago di Avigliana",
             11: "Via Trento",
-            12: "Casa di Davide", 
+            12: "Casa di Davide",
             13: "Casa di Formi",
             14: "Castello di Monca",
             15: "Gasprin",
-            16: "Casa di Pepe", 
+            16: "Casa di Pepe",
             17: "Roadhouse",
             18: "Punto di Ascolto",
             19: "Genova",
@@ -470,10 +492,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let interactionCooldown = 0;
     let questionBoxVisible = false;
 
-    let currentDirection = 0; 
+    let currentDirection = 0;
     let frameIndex = 0;
     let animationTimer = 0;
-    const ANIMATION_SPEED = 100; 
+    const ANIMATION_SPEED = 100;
 
     window.currentDirection = currentDirection;
     window.frameIndex = frameIndex;
@@ -482,16 +504,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let isRoomTransitioning = false;
 
     let transitionAlpha = 0;
-    let transitionDirection = 'in'; 
+    let transitionDirection = 'in';
     let transitionNewRoomId = null;
+
+    // Variabili portale 2 second sopra per ora
+    let portalOverlapTimer = 0;
+    let playerOverlappingDoor = null;
+    const PORTAL_TRANSITION_TIME = 2000; // 2s
 
     let keysPressed = {
         ArrowUp: false,
         ArrowDown: false,
         ArrowLeft: false,
         ArrowRight: false,
-        ' ': false, 
-        'e': false 
+        ' ': false,
+        'e': false
     };
 
     let buttonPressed = {
@@ -499,7 +526,7 @@ document.addEventListener('DOMContentLoaded', function() {
         down: false,
         left: false,
         right: false,
-        interact: false 
+        interact: false
     };
 
     function getFloorImageForRoom(roomId) {
@@ -511,14 +538,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadFloorImages() {
         floorImage.onload = () => {
-
+            // Callback quando l'immagine principale del pavimento è caricata
         };
 
         for (const roomId in floorImages) {
             const img = new Image();
             img.src = floorImages[roomId];
             img.onload = () => {
-
                 floorImagesLoaded[roomId] = img;
             };
         }
@@ -526,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function initializeChests() {
         for (let roomId = 1; roomId <= 24; roomId++) {
-            const roomQuestion = questions[roomId] || questions[1]; 
+            const roomQuestion = questions[roomId] || questions[1];
 
             chests[roomId] = {
                 x: canvas.width / 2 - Math.random() * 50,
@@ -538,11 +564,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 correctIndex: roomQuestion.correctIndex,
                 explanation: roomQuestion.explanation,
                 opened: false,
-                solved: false 
+                solved: false
             };
         }
 
-        chests[1].solved = true;
+        for (let i = 1; i <= 24; i++) {
+            chests[i].solved = true; // solo per test toglier epoi
+        }
     }
 
     function initializeDoorAttributes() {
@@ -551,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
             roomSystem.doorColors[roomId] = {};
 
             const connectedRooms = roomSystem.connections[roomId];
-            const positions = ["left", "right", "top", "bottom"];            
+            const positions = ["left", "right", "top", "bottom"];
             for (let i = positions.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [positions[i], positions[j]] = [positions[j], positions[i]];
@@ -569,16 +597,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function addDeadEndsAndModifyConnections() {
-
         const originalConnections = JSON.parse(JSON.stringify(roomSystem.connections));
 
         const deadEndRooms = [9, 10, 12, 16, 19, 21];
 
-        const oneWayConnections = [
-            {from: 2, to: 7},  
-            {from: 3, to: 8},  
-            {from: 5, to: 10}, 
-            {from: 11, to: 16} 
+        const oneWayConnections = [{
+                from: 2,
+                to: 7
+            },
+            {
+                from: 3,
+                to: 8
+            },
+            {
+                from: 5,
+                to: 10
+            },
+            {
+                from: 11,
+                to: 16
+            }
         ];
 
         oneWayConnections.forEach(conn => {
@@ -588,11 +626,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        const additionalConnections = [
-            {from: 1, to: 8},   
-            {from: 4, to: 10},  
-            {from: 14, to: 17}, 
-            {from: 9, to: 12}   
+        const additionalConnections = [{
+                from: 1,
+                to: 8
+            },
+            {
+                from: 4,
+                to: 10
+            },
+            {
+                from: 14,
+                to: 17
+            },
+            {
+                from: 9,
+                to: 12
+            }
         ];
 
         additionalConnections.forEach(conn => {
@@ -604,13 +653,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        const pathToFinal = [
-            {from: 22, to: 24},
-            {from: 23, to: 24},
-            {from: 18, to: 22},
-            {from: 19, to: 22},
-            {from: 20, to: 23},
-            {from: 21, to: 23}
+        const pathToFinal = [{
+                from: 22,
+                to: 24
+            },
+            {
+                from: 23,
+                to: 24
+            },
+            {
+                from: 18,
+                to: 22
+            },
+            {
+                from: 19,
+                to: 22
+            },
+            {
+                from: 20,
+                to: 23
+            },
+            {
+                from: 21,
+                to: 23
+            }
         ];
 
         pathToFinal.forEach(conn => {
@@ -636,9 +702,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const position = roomSystem.doorPositions[roomId][targetRoom] || "left";
                 const doorColor = roomSystem.doorColors[roomId][targetRoom] || "#FF5722";
 
-                const offsetSeed = parseInt(roomId) * 100 + parseInt(targetRoom);
-                const pseudoRandom = (offsetSeed * 9301 + 49297) % 233280 / 233280;
-                const offset = 0.3 + pseudoRandom * 0.4; 
+                // Imposta l'offset a 0.5 (metà) per tutti i portali
+                const offset = 0.5;
 
                 roomSystem.doors[roomId].push({
                     toRoom: targetRoom,
@@ -652,13 +717,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function drawSprite() {
         if (!playerSprite.complete) return;
-    
+
         ctx.drawImage(
             playerSprite,
-            frameIndex * spriteWidth, currentDirection * spriteHeight, 
-            spriteWidth, spriteHeight, 
-            player.x, player.y, 
-            player.width, player.height 
+            frameIndex * spriteWidth, currentDirection * spriteHeight,
+            spriteWidth, spriteHeight,
+            player.x, player.y,
+            player.width, player.height
         );
     }
 
@@ -669,14 +734,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chestImage.complete) {
             ctx.drawImage(chestImage, currentChest.x, currentChest.y, currentChest.width, currentChest.height);
         } else {
-            ctx.fillStyle = "#8B4513"; 
+            ctx.fillStyle = "#8B4513";
             ctx.fillRect(currentChest.x, currentChest.y, currentChest.width, currentChest.height);
             ctx.strokeStyle = "#000000";
             ctx.lineWidth = 2;
             ctx.strokeRect(currentChest.x, currentChest.y, currentChest.width, currentChest.height);
 
-            ctx.fillStyle = "#FFD700"; 
-            ctx.fillRect(currentChest.x + 15, currentChest.y + 20, 20, 5); 
+            ctx.fillStyle = "#FFD700";
+            ctx.fillRect(currentChest.x + 15, currentChest.y + 20, 20, 5);
         }
     }
 
@@ -700,58 +765,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ##
     function drawDoors(doors) {
+        // Trova tutti i frame validi una sola volta per evitare calcoli ripetuti
+        const validFrames = doorFrames.filter(img => img.complete && !img.isErrored);
+        
         doors.forEach(door => {
             let x = 0;
             let y = 0;
             let width = 50;
             let height = 70;
-
+            let rotation = 0;
+    
+            // Position calculation (keep your existing code)
             switch (door.position) {
                 case "top":
-                    x = canvas.width * door.offset - width / 2;
+                    x = (canvas.width / 2) - (width / 2);
                     y = 0;
+                    rotation = 120;
                     break;
                 case "right":
                     x = canvas.width - width;
-                    y = canvas.height * door.offset - height / 2;
+                    y = (canvas.height / 2) - (height / 2);
+                    rotation = 180;
                     break;
                 case "bottom":
-                    x = canvas.width * door.offset - width / 2;
+                    x = (canvas.width / 2) - (width / 2);
                     y = canvas.height - height;
+                    rotation = -60;
                     break;
                 case "left":
                     x = 0;
-                    y = canvas.height * door.offset - height / 2;
+                    y = (canvas.height / 2) - (height / 2);
+                    rotation = 0;
                     break;
             }
-
+    
             const doorLocked = !chests[roomSystem.currentRoom].solved;
-
-            if (doorImage.complete && lockedDoorImage.complete) {
-                if (doorLocked) {
-
-                    ctx.drawImage(lockedDoorImage, x, y, width, height);
-                } else {
-
-                    ctx.drawImage(doorImage, x, y, width, height);
-                }
+    
+            ctx.save();
+            ctx.translate(x + width / 2, y + height / 2);
+            ctx.rotate(rotation * Math.PI / 180);
+            
+            if (doorLocked && lockedDoorImage.complete) {
+                // Locked door - just draw the locked image
+                ctx.drawImage(lockedDoorImage, -width / 2, -height / 2, width, height);
+            } else if (!doorLocked && validFrames.length > 0) {
+                // Qui usiamo l'indice corrente LIMITATO al numero di frame validi
+                // così, anche se doorAnimFrame diventa troppo grande, lo conterremo nel range valido
+                const currentFrameIndex = doorAnimFrame % validFrames.length;
+                const frameToUse = validFrames[currentFrameIndex];
+                
+                // Animated door - draw the current valid frame
+                ctx.drawImage(frameToUse, -width / 2, -height / 2, width, height);
             } else {
-
-                ctx.fillStyle = doorLocked ? "#FF0000" : "#8B4513"; 
-                ctx.fillRect(x, y, width, height);
-
+                // Fallback if no valid frames are available
+                ctx.fillStyle = doorLocked ? "#FF0000" : "#8B4513";
+                ctx.fillRect(-width / 2, -height / 2, width, height);
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 4;
-                ctx.strokeRect(x, y, width, height);
-
-                ctx.fillStyle = doorLocked ? "#FF6666" : "#A0522D"; 
+                ctx.strokeRect(-width / 2, -height / 2, width, height);
+                
+                ctx.fillStyle = doorLocked ? "#FF6666" : "#A0522D";
                 const panelPadding = 10;
-                ctx.fillRect(x + panelPadding, y + panelPadding,
+                ctx.fillRect(-width / 2 + panelPadding, -height / 2 + panelPadding,
                     width - panelPadding * 2, height - panelPadding * 2);
             }
+            
+            ctx.restore();
+            
+            // Store door position info
+            door.x = x;
+            door.y = y;
+            door.width = width;
+            door.height = height;
         });
     }
+    
 
     function drawPopup() {
         if (!isPopupOpen || questionBoxVisible) return;
@@ -764,14 +854,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const popupX = (canvas.width - popupWidth) / 2;
         const popupY = (canvas.height - popupHeight) / 2;
 
-        ctx.fillStyle = "#F5F5DC"; 
+        ctx.fillStyle = "#F5F5DC";
         ctx.fillRect(popupX, popupY, popupWidth, popupHeight);
-        ctx.strokeStyle = "#8B4513"; 
+        ctx.strokeStyle = "#8B4513";
         ctx.lineWidth = 4;
         ctx.strokeRect(popupX, popupY, popupWidth, popupHeight);
 
         ctx.fillStyle = "#000000";
-        ctx.font = "16px";
+        ctx.font = "16px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
@@ -832,9 +922,9 @@ document.addEventListener('DOMContentLoaded', function() {
             playerCenterX, playerCenterY, lightRadius + lightSettings.softness
         );
 
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); 
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
         gradient.addColorStop(lightSettings.intensity, 'rgba(0, 0, 0, 0.9)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); 
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         darknessCtx.fillStyle = gradient;
         darknessCtx.beginPath();
@@ -907,7 +997,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function convertToGreenPhosphor() {
-
         if (window.player && window.player.color) {
             window.player.color = '#00ff00';
         }
@@ -939,22 +1028,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAnimation(deltaTime, isMoving) {
         if (isMoving) {
             animationTimer += deltaTime;
-    
+
             if (animationTimer >= ANIMATION_SPEED) {
                 frameIndex = (frameIndex + 1) % 3; // 3 frame per colonna (4 direzioni)
-                window.frameIndex = frameIndex; 
+                window.frameIndex = frameIndex;
                 animationTimer = 0;
             }
         } else {
             frameIndex = 0;
-            window.frameIndex = frameIndex; 
+            window.frameIndex = frameIndex;
         }
     }
 
     function updateTransition(deltaTime) {
         if (!isRoomTransitioning) return;
 
-        const fadeSpeed = 0.003; 
+        const fadeSpeed = 0.003;
 
         if (transitionDirection === 'in') {
             transitionAlpha += fadeSpeed * deltaTime;
@@ -996,25 +1085,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (moveUp) {
             currentDirection = 3;
-            window.currentDirection = currentDirection; 
+            window.currentDirection = currentDirection;
             if (player.y > 0) player.y -= player.speed;
             moving = true;
         }
         if (moveDown) {
             currentDirection = 0;
-            window.currentDirection = currentDirection; 
+            window.currentDirection = currentDirection;
             if (player.y + player.height < canvas.height) player.y += player.speed;
             moving = true;
         }
         if (moveLeft) {
             currentDirection = 1;
-            window.currentDirection = currentDirection; 
+            window.currentDirection = currentDirection;
             if (player.x > 0) player.x -= player.speed;
             moving = true;
         }
         if (moveRight) {
             currentDirection = 2;
-            window.currentDirection = currentDirection; 
+            window.currentDirection = currentDirection;
             if (player.x + player.width < canvas.width) player.x += player.speed;
             moving = true;
         }
@@ -1023,12 +1112,10 @@ document.addEventListener('DOMContentLoaded', function() {
             handleInteraction();
         }
 
-        if (moving) {
-            checkDoorCollision();
-        }
+        checkDoorCollision();
 
         if (interactionCooldown > 0) {
-            interactionCooldown -= 16; 
+            interactionCooldown -= 16;
             if (interactionCooldown < 0) interactionCooldown = 0;
         }
 
@@ -1040,6 +1127,11 @@ document.addEventListener('DOMContentLoaded', function() {
         drawRoom();
         drawChest();
         drawSprite();
+
+        if (playerOverlappingDoor !== null && portalOverlapTimer > 0) {
+            drawPortalProgress(portalOverlapTimer / PORTAL_TRANSITION_TIME);
+        }
+
         drawPopup();
     }
 
@@ -1063,42 +1155,144 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkDoorCollision() {
         if (isRoomTransitioning) return;
         if (!chests[roomSystem.currentRoom].solved) {
+            playerOverlappingDoor = null;
+            portalOverlapTimer = 0;
             return;
         }
 
         const doors = roomSystem.doors[roomSystem.currentRoom] || [];
+        let isOverlapping = false;
 
         for (const door of doors) {
-            let x = 0;
-            let y = 0;
-            let width = 50;
-            let height = 70;
-            switch (door.position) {
-                case "top":
-                    x = canvas.width * door.offset - width / 2;
-                    y = 0;
-                    break;
-                case "right":
-                    x = canvas.width - width;
-                    y = canvas.height * door.offset - height / 2;
-                    break;
-                case "bottom":
-                    x = canvas.width * door.offset - width / 2;
-                    y = canvas.height - height;
-                    break;
-                case "left":
-                    x = 0;
-                    y = canvas.height * door.offset - height / 2;
-                    break;
-            }
+            const x = door.x;
+            const y = door.y;
+            const width = door.width;
+            const height = door.height;
+
             if (player.x < x + width &&
                 player.x + player.width > x &&
                 player.y < y + height &&
                 player.y + player.height > y) {
-                showRoomTransition(door.toRoom);
+
+                isOverlapping = true;
+
+                if (playerOverlappingDoor !== door.toRoom) {
+                    playerOverlappingDoor = door.toRoom;
+                    portalOverlapTimer = 0;
+                }
+
                 break;
             }
         }
+
+        if (!isOverlapping) {
+            portalOverlapTimer = 0;
+            playerOverlappingDoor = null;
+        }
+    }
+
+    function drawPortalProgress(progress) {
+        if (progress <= 0) return;
+
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
+        const radius = Math.max(player.width, player.height) * 0.8;
+
+        ctx.save();
+
+        // cerchio esterno (bordo)
+        /*
+        ctx.beginPath();
+        ctx.arc(playerCenterX, playerCenterY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        */
+        // arco di progresso
+        ctx.beginPath();
+        ctx.arc(playerCenterX, playerCenterY, radius - 10, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * progress));
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function updateDoorAnimation(deltaTime) {
+        doorAnimTimer += deltaTime;
+        if (doorAnimTimer >= DOOR_ANIM_SPEED) {
+            const validFrames = doorFrames.filter(img => img.complete && !img.isErrored);
+            if (validFrames.length > 0) {
+                doorAnimFrame = (doorAnimFrame + 1) % validFrames.length;
+            } else {
+                doorAnimFrame = 0;
+            }
+            doorAnimTimer = 0;
+        }
+    }
+
+    function gameLoop(currentTime) {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        
+        const isMoving = updateMovement();
+        updateAnimation(deltaTime, isMoving);
+        updateTransition(deltaTime);
+        
+        updateDoorAnimation(deltaTime);
+
+        if (playerOverlappingDoor !== null && !isRoomTransitioning && !isPopupOpen && !questionBoxVisible) {
+            const doors = roomSystem.doors[roomSystem.currentRoom] || [];
+            let stillOverlapping = false;
+
+            for (const door of doors) {
+                if (door.toRoom === playerOverlappingDoor) {
+                    const x = door.x;
+                    const y = door.y;
+                    const width = door.width;
+                    const height = door.height;
+
+                    if (player.x < x + width &&
+                        player.x + player.width > x &&
+                        player.y < y + height &&
+                        player.y + player.height > y) {
+                        stillOverlapping = true;
+                        break;
+                    }
+                }
+            }
+
+            if (stillOverlapping) {
+                portalOverlapTimer += deltaTime;
+                if (portalOverlapTimer >= PORTAL_TRANSITION_TIME) {
+                    showRoomTransition(playerOverlappingDoor);
+                    portalOverlapTimer = 0;
+                    playerOverlappingDoor = null;
+                }
+            } else {
+                portalOverlapTimer = 0;
+                playerOverlappingDoor = null;
+            }
+        }
+
+        if (questionBoxVisible) {
+            drawQuestionDarkness();
+        } else {
+            drawDarkness();
+        }
+
+        if (!timerPaused) {
+            updateTimerDisplay();
+        }
+
+        window.renderGame();
+        drawTransition();
+
+        if (window.isMultiplayer && typeof window.drawOtherPlayer === 'function') {
+            window.drawOtherPlayer();
+        }
+
+        requestAnimationFrame(gameLoop);
     }
 
     function changeRoom(newRoomId) {
@@ -1215,9 +1409,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (answerIndex === currentChest.correctIndex) {
-
             setTimeout(() => {
-
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
                     <p style="color: #00ff00; margin-top: 20px;">${currentChest.explanation}</p>
@@ -1229,9 +1421,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }, 1000);
         } else {
-
             setTimeout(() => {
-
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
                     <p style="color: #ff6666; margin-top: 20px;">SBAGLIATO!</p>
@@ -1239,7 +1429,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
 
                 document.getElementById('tryAgainButton').addEventListener('click', function() {
-
                     document.body.removeChild(questionBox);
                     questionBoxVisible = false;
                     showQuestionBox();
@@ -1257,7 +1446,6 @@ document.addEventListener('DOMContentLoaded', function() {
         questionBoxVisible = false;
 
         if (solved) {
-
             const currentChest = chests[roomSystem.currentRoom];
             currentChest.opened = true;
             currentChest.solved = true;
@@ -1277,15 +1465,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isRoomTransitioning || isPopupOpen || questionBoxVisible) return;
         if (interactionCooldown > 0) return;
 
-        interactionCooldown = 500; 
+        interactionCooldown = 500;
 
         if (isPlayerNearChest()) {
             const currentChest = chests[roomSystem.currentRoom];
 
             if (currentChest.solved) {
-
+                //
             } else {
-
                 showQuestionBox();
             }
         }
@@ -1294,7 +1481,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePuzzleStatus() {
         const statusElement = document.getElementById('puzzleStatus');
         if (statusElement) {
-            // Notifica rimossa per ora
             const isSolved = chests[roomSystem.currentRoom] && chests[roomSystem.currentRoom].solved;
             statusElement.textContent = isSolved ? "RISOLTO! Portali sbloccati" : "Risolvi l'enigma per sbloccare i portali";
             statusElement.className = isSolved ? "puzzle-solved" : "puzzle-unsolved";
@@ -1347,34 +1533,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function gameLoop(currentTime) {
-        const deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
-        const isMoving = updateMovement();
-        updateAnimation(deltaTime, isMoving);
-        updateTransition(deltaTime);
-
-        if (questionBoxVisible) {
-            drawQuestionDarkness();
-        } else {
-            drawDarkness();
-        }
-
-        if (!timerPaused) {
-            updateTimerDisplay();
-        }
-
-        window.renderGame();
-        drawTransition();
-
-        if (window.isMultiplayer && typeof window.drawOtherPlayer === 'function') {
-            window.drawOtherPlayer();
-        }
-
-        requestAnimationFrame(gameLoop);
-    }
-
-    let gameTime = 30 * 60 * 1000; 
+    let gameTime = 30 * 60 * 1000;
     let timerStartTime = 0;
     let timerPaused = true;
 
@@ -1481,15 +1640,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     };
 
+    window.isPlayerNearChest = isPlayerNearChest;
+    window.handleInteraction = handleInteraction;
+
     function initGame() {
         loadFloorImages();
         initializeChests();
         addDeadEndsAndModifyConnections();
         generateDoors();
-
+        
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height / 2 - player.height / 2;
-
+        
         canvas.addEventListener('click', handlePopupClick);
         initTimer();
         updatePuzzleStatus();
@@ -1557,43 +1719,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // ########## FUNZIONE RIMOSSA, NON UTILIZZATA, MANTERE PER SICUREZZA
-    const controlsDiv = document.querySelector('.controls');
-    if (controlsDiv) {
-        const interactButton = document.createElement('button');
-        interactButton.textContent = 'INTERAGISCI';
-        interactButton.className = 'interact-button';
-
-        interactButton.addEventListener('mousedown', function() {
-            buttonPressed.interact = true;
-        });
-
-        interactButton.addEventListener('mouseup', function() {
-            buttonPressed.interact = false;
-        });
-
-        interactButton.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            buttonPressed.interact = true;
-        });
-
-        interactButton.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            buttonPressed.interact = false;
-        });
-
-        controlsDiv.appendChild(interactButton);
-    }
-    // ########## FUNZIONE RIMOSSA, NON UTILIZZATA, MANTERE PER SICUREZZA
-
-
     window.debugRoom = function() {
         renderGame();
     };
-
     if (typeof window.skipMainInit === 'undefined' || !window.skipMainInit) {
-
         if (playerSprite.complete) {
             initGame();
         } else {
