@@ -52,21 +52,21 @@ io.on('connection', (socket) => {
 
         if (!gameRooms[gameCode]) {
             socket.emit('gameError', {
-                message: 'Game not found'
+                message: 'GAME CODE Error'
             });
             return;
         }
 
         if (gameRooms[gameCode].players.length >= 2) {
             socket.emit('gameError', {
-                message: 'Game is full'
+                message: 'FULL Lobby'
             });
             return;
         }
 
         if (gameRooms[gameCode].started) {
             socket.emit('gameError', {
-                message: 'Game has already started'
+                message: 'GAME Iniziato'
             });
             return;
         }

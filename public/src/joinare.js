@@ -33,11 +33,6 @@ window.drawOtherPlayer = function() {
     } else {
         drawPlayerFallback();
     }
-
-    window.ctx.fillStyle = "white";
-    window.ctx.font = "12px Arial";
-    window.ctx.textAlign = "center";
-    window.ctx.fillText("Player 2", otherPlayerData.x + window.player.width / 2, otherPlayerData.y - 10);
 };
 
 function drawPlayerFallback() {
@@ -65,11 +60,11 @@ function showMultiplayerVictory() {
     victoryBanner.className = 'victory-banner';
     victoryBanner.innerHTML = `
         <div class="banner-content">
-            <h2>CONGRATULATIONS!</h2>
-            <p>Both players reached the Treasure Chamber!</p>
+            <h2>SIIIIII!</h2>
+            <p>Abbiamo vinto daje!</p>
             <div class="banner-buttons">
-                <button id="restartButton">Restart Game</button>
-                <button id="stayButton">Continue Playing</button>
+                <button id="restartButton">RICOMINCIA</button>
+                <button id="stayButton">CHIUDI</button>
             </div>
         </div>
     `;
@@ -218,7 +213,7 @@ function createGame() {
 
 function joinGame(code) {
     if (!code || code.length !== 4) {
-        showErrorMessage("Please enter a valid 4-character game code");
+        showErrorMessage("GAME CODE");
         return;
     }
 
@@ -243,7 +238,7 @@ function sendGameStateUpdate() {
 
         socket.emit('updateGameState', gameState);
     } catch (e) {
-        console.error("Error sending game state:", e);
+        console.error("Error: ", e);
     }
 }
 
@@ -264,7 +259,7 @@ function setupGameExtensions() {
         };
 
     } else {
-        console.error("Could not find renderGame function to extend - window.renderGame:", window.renderGame);
+        console.error("Error (renderGame): ", window.renderGame);
     }
 }
 
@@ -273,7 +268,7 @@ function markRoomDiscovered(roomId) {
 
     const progressElement = document.getElementById('explorationProgress');
     if (progressElement) {
-        progressElement.textContent = `Exploration: ${discoveredRooms.size}/24 rooms`;
+        progressElement.textContent = `Nav: ${discoveredRooms.size}/24 rooms`;
     }
 }
 
@@ -285,22 +280,22 @@ function createMainMenuUI() {
 
     menuContainer.innerHTML = `
         <div class="menu-content">
-            <h1>SILVI - Pixel Game</h1>
+            <h1>SILVI</h1>
             <div class="menu-buttons">
-                <button id="singlePlayerBtn">Single Player</button>
-                <button id="createGameBtn">Create Multiplayer Game</button>
-                <button id="joinGameBtn">Join Multiplayer Game</button>
+                <button id="singlePlayerBtn">ARCADE</button>
+                <button id="createGameBtn">HOST</button>
+                <button id="joinGameBtn">JOIN</button>
             </div>
             <div id="joinGameForm" class="join-form" style="display: none;">
-                <input id="gameCodeInput" type="text" maxlength="4" placeholder="Enter 4-letter game code">
-                <button id="submitJoinBtn">Join</button>
-                <button id="cancelJoinBtn">Cancel</button>
+                <input id="gameCodeInput" type="text" maxlength="4" placeholder="GAME CODE">
+                <button id="submitJoinBtn">JOIN</button>
+                <button id="cancelJoinBtn">CLOSE</button>
             </div>
             <div id="gameCodeDisplay" class="game-code-display" style="display: none;">
-                <h3>Your Game Code</h3>
+                <h3>GAME CODE</h3>
                 <div id="gameCodeValue" class="game-code-value"></div>
-                <p>Share this code with another player to join your game</p>
-                <button id="startGameBtn">Start Game</button>
+                <p>Condivi il codice</p>
+                <button id="startGameBtn">START</button>
             </div>
             <div id="errorMessage" class="error-message"></div>
         </div>
@@ -364,9 +359,9 @@ function showConnectedMessage(hostId) {
     const menuContainer = document.getElementById('menuContainer');
     menuContainer.innerHTML = `
         <div class="menu-content">
-            <h2>Connected to Game!</h2>
-            <p>You have successfully joined the game.</p>
-            <p>Waiting for host to start the game...</p>
+            <h2>CONNESSO!</h2>
+            <p>Hai joinato cazzo brao.</p>
+            <p>Digli all'host di avviare dai...</p>
         </div>
     `;
 }
@@ -375,19 +370,19 @@ function showPlayerJoinedMessage(playerId) {
     const startButton = document.getElementById('startGameBtn');
     if (startButton) {
         startButton.disabled = false;
-        startButton.textContent = 'Start Game (Player Joined)';
+        startButton.textContent = 'STARTA (Joinato)';
     }
 
     const notification = document.createElement('div');
     notification.className = 'notification';
-    notification.textContent = 'Player has joined your game!';
+    notification.textContent = 'JOINATO!';
     document.body.appendChild(notification);
 
     setTimeout(() => {
         try {
             document.body.removeChild(notification);
         } catch (e) {
-            console.error("Error removing notification:", e);
+            console.error("Error: ", e);
         }
     }, 3000);
 }
@@ -440,7 +435,7 @@ function hideMenuAndStartGame() {
 
             gameInit = true;
         } else {
-            console.error("Could not find initGame function");
+            console.error("Error (initGame): ");
         }
     }
 }

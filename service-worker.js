@@ -43,7 +43,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
       .catch(error => {
-        console.error('Errore durante il caching delle risorse:', error);
+        console.error('Errore caching: ', error);
       })
   );
 });

@@ -202,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         color: 'rgba(0, 255, 0, 0.4)' 
     };
 
+    //TODO: Domande e risposte Enigmi/Canzoni
     const questions = {
         1: {
             question: "Welcome to the adventure! What's your favorite color?",
@@ -379,9 +380,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const floorImagesLoaded = {};
 
-    const spriteWidth = 29; // 116 / 4 = 29 px 
-    const spriteHeight = 30.5; // 122 / 4 = 30.5 pixels 
-    const columns = 4;
+    const spriteWidth = 29; // 87 / 3 = 29 px per frame
+    const spriteHeight = 30.5; // 122 / 4 = 30.5 px x direzione (4 direzioni per ora)
+    const columns = 3; // 3 colonne valutare quarta
 
     window.spriteWidth = spriteWidth;
     window.spriteHeight = spriteHeight;
@@ -431,34 +432,30 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         currentRoom: 1,
         roomNames: {
-            1: "Entrance Hall",
-            2: "Main Corridor",
-            3: "Dusty Passage",
-            4: "Abandoned Storeroom", 
-
-            5: "Eastern Hallway",
-            6: "Western Corridor",
-            7: "Grand Staircase",
-            8: "Forgotten Library",
-            9: "Armory",
-            10: "Empty Guard Room", 
-            11: "Dining Hall",
-            12: "Collapsed Passage", 
-
-            13: "Upper Balcony",
-            14: "Secret Study",
-            15: "Knight's Chamber",
-            16: "Kitchen Ruins", 
-            17: "Wine Cellar",
-            18: "Observatory",
-            19: "Alchemy Lab",
-            20: "Throne Room",
-            21: "Hidden Tunnel",
-
-            22: "Northern Gateway",
-            23: "Southern Gateway",
-
-            24: "Treasure Chamber"
+            1: "Negozio",
+            2: "La Piadineria",
+            3: "UGC Cinema",
+            4: "Lago di Viverone", 
+            5: "Bar Noce",
+            6: "Mondo Juve",
+            7: "Follonica",
+            8: "Alambicco",
+            9: "Camping Thaiti",
+            10: "Lago di Avigliana", 
+            11: "Via Trento",
+            12: "Casa di Davide", 
+            13: "Casa di Formi",
+            14: "Castello di Monca",
+            15: "Gasprin",
+            16: "Casa di Pepe", 
+            17: "Roadhouse",
+            18: "Punto di Ascolto",
+            19: "Genova",
+            20: "Bowling Playcity",
+            21: "Castiglione della Pescaia",
+            22: "Porco Rosso",
+            23: "Mondo di Miyazaki",
+            24: "Pecetto"
         },
         doorPositions: {},
         doorColors: {},
@@ -534,8 +531,8 @@ document.addEventListener('DOMContentLoaded', function() {
             chests[roomId] = {
                 x: canvas.width / 2 - Math.random() * 50,
                 y: canvas.height / 2 - Math.random() * 50,
-                width: 35,
-                height: 35,
+                width: 40,
+                height: 32,
                 question: roomQuestion.question,
                 answers: roomQuestion.answers,
                 correctIndex: roomQuestion.correctIndex,
@@ -663,13 +660,6 @@ document.addEventListener('DOMContentLoaded', function() {
             player.x, player.y, 
             player.width, player.height 
         );
-    
-        if (window.isMultiplayer) {
-            ctx.fillStyle = "green";
-            ctx.font = "12px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("You", player.x + player.width / 2, player.y - 10);
-        }
     }
 
     function drawChest() {
@@ -781,7 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.strokeRect(popupX, popupY, popupWidth, popupHeight);
 
         ctx.fillStyle = "#000000";
-        ctx.font = "16px Arial";
+        ctx.font = "16px";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
@@ -795,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = "#8B4513";
         ctx.fillRect(popupX + popupWidth / 2 - 40, popupY + popupHeight - 30, 80, 20);
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillText("Chiudi", popupX + popupWidth / 2, popupY + popupHeight - 20);
+        ctx.fillText("CHIUDI", popupX + popupWidth / 2, popupY + popupHeight - 20);
 
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
@@ -949,9 +939,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAnimation(deltaTime, isMoving) {
         if (isMoving) {
             animationTimer += deltaTime;
-
+    
             if (animationTimer >= ANIMATION_SPEED) {
-                frameIndex = (frameIndex + 1) % 4;
+                frameIndex = (frameIndex + 1) % 3; // 3 frame per colonna (4 direzioni)
                 window.frameIndex = frameIndex; 
                 animationTimer = 0;
             }
@@ -1054,14 +1044,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     window.renderGame = function() {
-
         ctx.save();
-
         ctx.fillStyle = '#001100';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         renderGame();
-
         ctx.restore();
     };
 
@@ -1143,10 +1129,10 @@ document.addEventListener('DOMContentLoaded', function() {
         victoryElement.className = 'victory-overlay';
         victoryElement.innerHTML = `
         <div class="victory-content">
-            <h1>CONGRATULATIONS!</h1>
-            <p>You reached the Treasure Chamber!</p>
-            <p>But the true adventure is playing with a friend!</p>
-            <button id="restartButton">Play Again</button>
+            <h1>CONGRATULAZIONI!</h1>
+            <p>test!</p>
+            <p>test!</p>
+            <button id="restartButton">RIAVVIA</button>
         </div>
     `;
         document.body.appendChild(victoryElement);
@@ -1235,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
                     <p style="color: #00ff00; margin-top: 20px;">${currentChest.explanation}</p>
-                    <button id="continueButton" class="answer-button" style="margin-top: 20px;">Continue</button>
+                    <button id="continueButton" class="answer-button" style="margin-top: 20px;">CONTINUA</button>
                 `;
 
                 document.getElementById('continueButton').addEventListener('click', function() {
@@ -1248,8 +1234,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const questionBox = document.getElementById('questionBox');
                 questionBox.innerHTML += `
-                    <p style="color: #ff6666; margin-top: 20px;">Incorrect. Try again!</p>
-                    <button id="tryAgainButton" class="answer-button" style="margin-top: 20px;">Try Again</button>
+                    <p style="color: #ff6666; margin-top: 20px;">SBAGLIATO!</p>
+                    <button id="tryAgainButton" class="answer-button" style="margin-top: 20px;">RIPROVA</button>
                 `;
 
                 document.getElementById('tryAgainButton').addEventListener('click', function() {
@@ -1308,8 +1294,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePuzzleStatus() {
         const statusElement = document.getElementById('puzzleStatus');
         if (statusElement) {
+            // Notifica rimossa per ora
             const isSolved = chests[roomSystem.currentRoom] && chests[roomSystem.currentRoom].solved;
-            statusElement.textContent = isSolved ? "Puzzle Solved! Doors Unlocked" : "Find and solve the chest puzzle to unlock doors";
+            statusElement.textContent = isSolved ? "RISOLTO! Portali sbloccati" : "Risolvi l'enigma per sbloccare i portali";
             statusElement.className = isSolved ? "puzzle-solved" : "puzzle-unsolved";
         }
     }
@@ -1414,12 +1401,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeUpElement = document.createElement('div');
         timeUpElement.className = 'victory-overlay';
         timeUpElement.innerHTML = `
-<div class="victory-content time-up">
-<h1>TIME'S UP!</h1>
-<p>You ran out of time. Try again!</p>
-<button id="restartButton">Restart Game</button>
-</div>
-`;
+            <div class="victory-content time-up">
+            <h1>TEMPO SCADUTO!</h1>
+            <p>Hai perso, il tempo è fino, riprova!</p>
+            <button id="restartButton">RIPROVA</button>
+            </div>
+        `;
         document.body.appendChild(timeUpElement);
         document.getElementById('restartButton').addEventListener('click', () => {
             document.body.removeChild(timeUpElement);
@@ -1478,10 +1465,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!roomId || !questionData) return false;
 
         questions[roomId] = {
-            question: questionData.question || "Default question?",
-            answers: questionData.answers || ["Yes", "No", "Maybe", "I don't know"],
+            question: questionData.question || "Default",
+            answers: questionData.answers || ["SI", "NO", "BOH", "NN LO SO"],
             correctIndex: questionData.correctIndex || 0,
-            explanation: questionData.explanation || "That's correct!"
+            explanation: questionData.explanation || "CORRETTO!"
         };
 
         if (chests[roomId]) {
@@ -1571,10 +1558,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ########## FUNZIONE RIMOSSA, NON UTILIZZATA, MANTERE PER SICUREZZA
     const controlsDiv = document.querySelector('.controls');
     if (controlsDiv) {
         const interactButton = document.createElement('button');
-        interactButton.textContent = 'Interagisci';
+        interactButton.textContent = 'INTERAGISCI';
         interactButton.className = 'interact-button';
 
         interactButton.addEventListener('mousedown', function() {
@@ -1597,6 +1585,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         controlsDiv.appendChild(interactButton);
     }
+    // ########## FUNZIONE RIMOSSA, NON UTILIZZATA, MANTERE PER SICUREZZA
+
 
     window.debugRoom = function() {
         renderGame();

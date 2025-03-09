@@ -1,4 +1,4 @@
-
+// NON UTILIZZATO, TEST DI FUNZIONAMENTO
 document.addEventListener('DOMContentLoaded', function() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
