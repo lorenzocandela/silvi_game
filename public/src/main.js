@@ -373,8 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //TODO: Aggiungere mappe nuove, magari non tutte capire bene
     const floorImages = {
-        1: '/assets/floors/test.png',
-        //1: '/assets/floors/floor1.png',
+        //1: '/assets/floors/test.png',
+        1: '/assets/floors/floor1.png',
         2: '/assets/floors/floor2.png',
         3: '/assets/floor3.png',
         4: '/assets/floor1.png',
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         15: '/assets/floor3.png',
         16: '/assets/floor1.png',
         17: '/assets/floor2.png',
-        18: '/assets/floor3.png',
+        18: '/assets/floors/floor18.png',
         19: '/assets/floor1.png',
         20: '/assets/floor2.png',
         21: '/assets/floor3.png',
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
             15: "Gasprin",
             16: "Casa di Pepe",
             17: "Roadhouse",
-            18: "Punto di Ascolto",
+            18: "Casa Dema",
             19: "Genova",
             20: "Bowling Playcity",
             21: "Castiglione della Pescaia",
@@ -567,10 +567,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 solved: false
             };
         }
-
+        /* RI ATTIVARE PER TEST
         for (let i = 1; i <= 24; i++) {
             chests[i].solved = true; // solo per test toglier epoi
-        }
+        }*/
     }
 
     function initializeDoorAttributes() {
