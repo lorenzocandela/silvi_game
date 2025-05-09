@@ -232,76 +232,76 @@ document.addEventListener('DOMContentLoaded', function() {
             explanation: ""
         },
         2: {
-            question: "What is the capital of France?",
-            answers: ["London", "Berlin", "Paris", "Madrid"],
-            correctIndex: 2,
-            explanation: "Paris is the capital of France."
+            question: "Dove ci siamo visti per la primissima volta?",
+            answers: ["Casa di Pegu", "Via Trento", "Parigi", "Casa di Pepe"],
+            correctIndex: 1,
+            explanation: "Sugli scivoli nel parchetto, era estate credo..."
         },
         3: {
-            question: "What is 2 + 2?",
-            answers: ["3", "4", "5", "22"],
-            correctIndex: 1,
-            explanation: "2 + 2 = 4"
+            question: "Che giorno ci siamo fidanzati?",
+            answers: ["24", "23", "25", "22"],
+            correctIndex: 0,
+            explanation: "Per poco 23...vabb"
         },
         4: {
-            question: "Which planet is known as the Red Planet?",
-            answers: ["Earth", "Venus", "Mars", "Jupiter"],
-            correctIndex: 2,
-            explanation: "Mars is known as the Red Planet due to its reddish appearance."
+            question: "Qual'è il mio colore preferito?",
+            answers: ["Nero", "Bianco", "Arancione", "Azzurro"],
+            correctIndex: 0,
+            explanation: "Azzurro cielo tipo film di Myiazaki :)"
         },
         5: {
-            question: "Who wrote 'Romeo and Juliet'?",
-            answers: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
-            correctIndex: 1,
-            explanation: "William Shakespeare wrote 'Romeo and Juliet'."
+            question: "Qual'è il mio film preferito dello studio Ghibli?",
+            answers: ["Si alza il vento", "Ponyo", "Porco Rosso", "Kiki"],
+            correctIndex: 0,
+            explanation: "Ovviamente Porco Rossooo..."
         },
         6: {
-            question: "What is the largest ocean on Earth?",
-            answers: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
-            correctIndex: 3,
-            explanation: "The Pacific Ocean is the largest ocean on Earth."
+            question: "Cosa amo di te?",
+            answers: ["Collo", "Occhi", "Mani", "Piedi"],
+            correctIndex: 0,
+            explanation: "hihi <3"
         },
         7: {
-            question: "Which element has the chemical symbol 'O'?",
-            answers: ["Oxygen", "Gold", "Silver", "Osmium"],
-            correctIndex: 0,
+            question: "Quanti gatti vorrei?",
+            answers: ["3", "1", "2", "4"],
+            correctIndex: 2,
             explanation: "Oxygen has the chemical symbol 'O'."
         },
         8: {
             question: "Come chiamiamo il barista dell'Alambicco?",
             answers: ["Gaspa", "Luca", "Povia", "Albi"],
-            correctIndex: 2,
-            explanation: ""
+            correctIndex: 1,
+            explanation: "duh.."
         },
         9: {
-            question: "What is the closest star to Earth?",
-            answers: ["Proxima Centauri", "Alpha Centauri", "Polaris", "The Sun"],
-            correctIndex: 3,
-            explanation: "The Sun is the closest star to Earth."
+            question: "Quanti figli vorrei?",
+            answers: ["1", "2", "3", "5"],
+            correctIndex: 1,
+            explanation: "Bimbo e bimba :D"
         },
         10: {
-            question: "Which animal is known as the 'King of the Jungle'?",
-            answers: ["Tiger", "Elephant", "Lion", "Giraffe"],
+            question: "Qual'è il mio animale preferito?",
+            answers: ["Medusa", "Tartaruga", "Leone", "Giraffa"],
             correctIndex: 2,
-            explanation: "The Lion is known as the 'King of the Jungle'."
+            explanation: "Questa è a caso eheh..."
         },
         11: {
-            question: "What is the largest planet in our solar system?",
-            answers: ["Earth", "Saturn", "Jupiter", "Neptune"],
-            correctIndex: 2,
-            explanation: "Jupiter is the largest planet in our solar system."
+            question: "Quali sono i miei biscotti preferiti?",
+            answers: ["Sfilati", "Meleghe", "Nascondini", "Abbraccia"],
+            correctIndex: 3,
+            explanation: "Facile questa..."
         },
         12: {
-            question: "Which of these is NOT a programming language?",
-            answers: ["Java", "Python", "Cobra", "HTML"],
-            correctIndex: 3,
-            explanation: "HTML is a markup language, not a programming language."
+            question: "Qual'è il mio linguaggio preferito?",
+            answers: ["CSS", "php", "JS", "HTML"],
+            correctIndex: 1,
+            explanation: "Facieeee..."
         },
         13: {
-            question: "What is the capital of Japan?",
-            answers: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
-            correctIndex: 2,
-            explanation: "Tokyo is the capital of Japan."
+            question: "Qual'è la mia macchina preferita attuale?",
+            answers: ["Mustangs", "Cayenne", "Puma", "Evoque"],
+            correctIndex: 3,
+            explanation: "Impossibile indovinare...ma la Evoque è bellizzima!"
         },
         14: {
             question: "La prima volta che siamo andati al Castello di Moncalieri da soli, che anno era?",
@@ -310,64 +310,64 @@ document.addEventListener('DOMContentLoaded', function() {
             explanation: "E li mi hai skifato :/"
         },
         15: {
-            question: "What is the hardest natural substance on Earth?",
-            answers: ["Diamond", "Gold", "Iron", "Steel"],
-            correctIndex: 0,
-            explanation: "Diamond is the hardest natural substance on Earth."
+            question: "Il mio giocatore preferito NBA?",
+            answers: ["Green", "Kobe", "Iverson", "Butler"],
+            correctIndex: 1,
+            explanation: "Black Mamba."
         },
         16: {
-            question: "How many continents are there on Earth?",
-            answers: ["5", "6", "7", "8"],
-            correctIndex: 2,
-            explanation: "There are 7 continents on Earth."
+            question: "Uno di questi rientra nella mia top 5",
+            answers: ["Good Will Hunting", "The Game", "Number 23", "Truman Capote"],
+            correctIndex: 0,
+            explanation: "Robin robin robin..."
         },
         17: {
-            question: "Who painted the Mona Lisa?",
-            answers: ["Van Gogh", "Da Vinci", "Picasso", "Michelangelo"],
+            question: "Artista preferito nell'anno prima di conoscerti?",
+            answers: ["XXX", "JuiceWRLD", "Thom Yorke", "Oliver Tree"],
             correctIndex: 1,
-            explanation: "Leonardo Da Vinci painted the Mona Lisa."
+            explanation: "In quel momento spingeva..."
         },
         18: {
-            question: "What's the smallest prime number?",
-            answers: ["0", "1", "2", "3"],
+            question: "Band preferita di sempre?",
+            answers: ["The Doors", "The Smiths", "21 pilots", "Radiohead"],
             correctIndex: 2,
-            explanation: "2 is the smallest prime number."
+            explanation: "..."
         },
         19: {
-            question: "Which of these is NOT a noble gas?",
-            answers: ["Helium", "Neon", "Chlorine", "Argon"],
-            correctIndex: 2,
-            explanation: "Chlorine is a halogen, not a noble gas."
+            question: "Uno di questi pezzi rientra nella mia top",
+            answers: ["Moonlight", "The Line", "Chlorine", "Hard Times"],
+            correctIndex: 1,
+            explanation: "My body is on the line now..."
         },
         20: {
-            question: "What's the capital of Australia?",
-            answers: ["Sydney", "Melbourne", "Perth", "Canberra"],
-            correctIndex: 3,
-            explanation: "Canberra is the capital of Australia, not Sydney."
+            question: "Mia best serie anime?",
+            answers: ["Evangelion", "HxH", "Bleach", "Solo Leveling"],
+            correctIndex: 1,
+            explanation: "Santedayoooooooooo"
         },
         21: {
-            question: "Which animal is known for its black and white stripes?",
-            answers: ["Giraffe", "Zebra", "Tiger", "Panda"],
-            correctIndex: 1,
-            explanation: "Zebras are known for their distinctive black and white stripes."
+            question: "Personaggio preferito anime?",
+            answers: ["Luffy", "Zoro", "Killua", "Ichigo"],
+            correctIndex: 2,
+            explanation: "ez 1"
         },
         22: {
-            question: "What is the most spoken language in the world?",
-            answers: ["English", "Spanish", "Hindi", "Mandarin"],
-            correctIndex: 3,
-            explanation: "Mandarin Chinese is the most spoken language in the world."
+            question: "Artista singolo preferito di sempre?",
+            answers: ["MacDemarco", "Spanish Sahara", "Calcutta", "Adele"],
+            correctIndex: 2,
+            explanation: "eh si..."
         },
         23: {
-            question: "Which of these is NOT a primary color?",
-            answers: ["Red", "Blue", "Green", "Yellow"],
+            question: "Quando ci lasceremo?",
+            answers: ["Domani", "Oggi", "Mai", "A breve"],
             correctIndex: 3,
-            explanation: "Yellow is a primary color in pigment but not in light (RGB)."
+            explanation: "<3"
         },
         24: {
-            question: "What is the final test. What lies beyond knowledge?",
-            answers: ["Power", "Wisdom", "Truth", "Understanding"],
+            question: "Mi ami?",
+            answers: ["Si", "Si", "Si", "Si"],
             correctIndex: 1,
-            explanation: "With knowledge comes wisdom, the ultimate treasure."
+            explanation: "Hai beccato l'unico si sbagliato, non mi ami."
         }
     };
 
@@ -566,10 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 opened: false,
                 solved: false
             };
-        }
-
-        for (let i = 1; i <= 24; i++) {
-            chests[i].solved = true; // solo per test toglier epoi
         }
     }
 
