@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
         5: {
             question: "Qual'è il mio film preferito dello studio Ghibli?",
             answers: ["Si alza il vento", "Ponyo", "Porco Rosso", "Kiki"],
-            correctIndex: 0,
+            correctIndex: 2,
             explanation: "Ovviamente Porco Rossooo..."
         },
         6: {
